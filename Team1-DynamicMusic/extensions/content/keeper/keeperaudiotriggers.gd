@@ -2,6 +2,7 @@ extends "res://content/keeper/keeper1/Keeper1.gd"
 @onready var Audio = get_node("/root/Audio") 
 var current_song = null
 func _process(delta):
+	print(Data.of("monsters.cycle"))
 	# TEST: If size is greater or equal than 2 play the song
 	if Data.of("monsters.wavepresent") == true:
 		if not Audio.isMusicPlaying() or current_song != "monsters_aproaching":
@@ -12,7 +13,12 @@ func _process(delta):
 		# if a song is playing, do not interrupt
 		var carriedvalue = 0
 		for item in carriedCarryables:
-			carriedvalue += getMaterialValue(item.type)
+			if getMaterialValue(item.type) == 99:
+				for drop in item.dropData:
+					carriedvalue += getMaterialValue(drop[0])
+			else:
+				carriedvalue += getMaterialValue(item.type)
+		print(carriedvalue)
 		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song != "good_loot":
 			current_song = "good_loot"
 			#play the song
@@ -29,9 +35,9 @@ func _process(delta):
 func getMaterialValue(material:String):
 	match material:
 		CONST.POWERCORE:
-			return 10
+			return 18
 		CONST.GADGET:
-			return 0
+			return 18
 		CONST.RELIC:
 			return 20
 		CONST.EGG:
@@ -41,6 +47,8 @@ func getMaterialValue(material:String):
 		CONST.WATER:
 			return 2
 		CONST.SAND:
+			if (Data.of("dome.health")*100) / Data.of("dome.maxhealth") <= 25:
+				return 6
 			return 3
 		CONST.PACK:
-			return 0
+			return 99
