@@ -11,7 +11,7 @@ func _init(modLoader = ModLoader):
 	var ext_dir = dir + EXTENSIONS_DIR
 	
 	# Add extensions
-	ModLoaderMod.install_script_extension(ext_dir+"content/keeper/keeperaudiotriggers.gd")
+	ModLoaderMod.install_script_extension(ext_dir + "content/keeper/keeperaudiotriggers.gd")
 		
 	ModLoaderLog.info("init done", MYMODNAME_LOG)
 
