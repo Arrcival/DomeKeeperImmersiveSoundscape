@@ -1,14 +1,24 @@
 extends "res://content/keeper/keeper1/Keeper1.gd"
 @onready var Audio = get_node("/root/Audio") 
 var current_song = null
+var time_between_waves = GameWorld.getTimeBetweenWaves()
+var time = 0
 func _process(delta):
-	print(Data.of("monsters.cycle"))
 	# TEST: If size is greater or equal than 2 play the song
-	if Data.of("monsters.wavepresent") == true:
-		if not Audio.isMusicPlaying() or current_song != "monsters_aproaching":
+	time = Data.of("monsters.wavecooldown")
+	if time <= 15 and time > 1:
+		var faraway = false
+		for keeper in Keepers.getAll():
+			var keeperDist = keeper.global_position.length()
+			if keeperDist > 500:
+				faraway = true
+		if not Audio.isMusicPlaying() or current_song != "monsters_aproaching" and faraway and Data.of("wavemeter.showbar") == true:
 			#play the song
 			current_song = "monsters_aproaching"
-			Audio.startMusic(1)
+			Audio.startMusic(0)
+	elif time < 1:
+		Audio.stopMusic(0.0,3.0)
+		current_song = null
 	elif carriedCarryables.size() >= 1:
 		# if a song is playing, do not interrupt
 		var carriedvalue = 0
@@ -18,7 +28,6 @@ func _process(delta):
 					carriedvalue += getMaterialValue(drop[0])
 			else:
 				carriedvalue += getMaterialValue(item.type)
-		print(carriedvalue)
 		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song != "good_loot":
 			current_song = "good_loot"
 			#play the song
