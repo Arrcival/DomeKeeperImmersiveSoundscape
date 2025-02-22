@@ -6,6 +6,8 @@ var time = 0
 func _process(delta):
 	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
+	if not Audio.isMusicPlaying():
+		current_song = null
 	if time <= 15 and time > 1:
 		var faraway = false
 		for keeper in Keepers.getAll():
@@ -16,7 +18,7 @@ func _process(delta):
 			#play the song
 			current_song = "monsters_aproaching"
 			Audio.startMusic(0)
-	elif time < 1:
+	elif time < 0.5:
 		Audio.stopMusic(0.0,3.0)
 		current_song = null
 	elif carriedCarryables.size() >= 1:
@@ -31,7 +33,6 @@ func _process(delta):
 		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song != "good_loot":
 			current_song = "good_loot"
 			#play the song
-			print("playing good loot")
 			Audio.startMusic(1,3.0)
 		elif carriedvalue < 9:
 			carriedvalue = 0
