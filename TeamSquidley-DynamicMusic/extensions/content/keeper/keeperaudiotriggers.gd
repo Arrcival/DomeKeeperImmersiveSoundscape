@@ -9,15 +9,25 @@ func _process(delta):
 	if not Audio.isMusicPlaying():
 		current_song = null
 	if time <= 15 and time > 1:
-		var faraway = false
+		var faraway = 0
 		for keeper in Keepers.getAll():
 			var keeperDist = keeper.global_position.length()
-			if keeperDist > 500:
-				faraway = true
-		if not Audio.isMusicPlaying() or current_song != "monsters_aproaching" and faraway and Data.of("wavemeter.showbar") == true:
+			if keeperDist > 1000:
+				faraway = 3
+			elif keeperDist > 750:
+				faraway = 2
+			elif keeperDist > 500:
+				faraway = 1
+		if not Audio.isMusicPlaying() or current_song != "monsters_aproaching" and faraway != 0 and Data.of("wavemeter.showbar") == true:
 			#play the song
 			current_song = "monsters_aproaching"
-			Audio.startMusic(0)
+			#These should be different ones depending on the faraway value
+			if faraway == 3:
+				Audio.startMusic(0)
+			elif faraway == 2:
+				Audio.startMusic(0)
+			elif faraway == 1:
+				Audio.startMusic(0)
 	elif time < 0.5:
 		Audio.stopMusic(0.0,3.0)
 		current_song = null
