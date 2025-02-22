@@ -11,8 +11,21 @@ func _init(modLoader = ModLoader):
 	var ext_dir = dir + EXTENSIONS_DIR
 	
 	# Add extensions
-	loadExtension(ext_dir, "content/keeper/keeperaudiotriggers.gd")
 	loadExtension(ext_dir, "content/audio/Audio.gd")
+	loadExtension(ext_dir, "content/keeper/keeperaudiotriggers.gd")
+	loadExtension(ext_dir, "content/monster/Beast/Beast.gd")
+	loadExtension(ext_dir, "content/monster/bigtick/BigTick.gd")
+	loadExtension(ext_dir, "content/monster/diver/Diver.gd")
+	loadExtension(ext_dir, "content/monster/driller/Driller.gd")
+	loadExtension(ext_dir, "content/monster/hornet/Hornet.gd")
+	loadExtension(ext_dir, "content/monster/mucker/Mucker.gd")
+	loadExtension(ext_dir, "content/monster/phaser/Phaser.gd")
+	loadExtension(ext_dir, "content/monster/rockman/Rockman.gd")
+	loadExtension(ext_dir, "content/monster/tick/Tick.gd")
+	loadExtension(ext_dir, "content/monster/walker/Walker.gd")
+	loadExtension(ext_dir, "content/monster/worm/Rock.gd")
+	loadExtension(ext_dir, "content/projectiles/DirectProjectile.gd")
+	loadExtension(ext_dir, "content/projectiles/PathProjectile.gd")
 	
 	ModLoaderLog.info("init done", MYMODNAME_LOG)
 
