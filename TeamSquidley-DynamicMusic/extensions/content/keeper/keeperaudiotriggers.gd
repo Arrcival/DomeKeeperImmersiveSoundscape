@@ -1,13 +1,21 @@
 extends "res://content/keeper/keeper1/Keeper1.gd"
-@onready var Audio = get_node("/root/Audio") 
+@onready var Audio = get_node("/root/Audio")
 var current_song = null
 var time_between_waves = GameWorld.getTimeBetweenWaves()
 var time = 0
+var timewithoutmusic = 0
+const layer1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-1.ogg")
+const layer2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-2.ogg")
+const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-3.ogg")
 func _process(delta):
 	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
-	if not Audio.isMusicPlaying():
-		current_song = null
+	if not Audio.isMusicPlaying() and current_song != null:
+		timewithoutmusic += delta
+		if timewithoutmusic > 3:
+			current_song = null
+	else:
+		timewithoutmusic = 0
 	if time <= 15 and time > 1:
 		var faraway = 0
 		for keeper in Keepers.getAll():
@@ -23,16 +31,15 @@ func _process(delta):
 			current_song = "monsters_aproaching"
 			#These should be different ones depending on the faraway value
 			if faraway == 3:
-				Audio.startMusic(0)
+				Audio.playTrack(layer1)
 			elif faraway == 2:
-				Audio.startMusic(0)
+				Audio.playTrack(layer2)
 			elif faraway == 1:
-				Audio.startMusic(0)
+				Audio.playTrack(layer3)
 	elif time < 0.5:
 		Audio.stopMusic(0.0,3.0)
 		current_song = null
 	elif carriedCarryables.size() >= 1:
-		# if a song is playing, do not interrupt
 		var carriedvalue = 0
 		for item in carriedCarryables:
 			if getMaterialValue(item.type) == 99:
@@ -40,6 +47,7 @@ func _process(delta):
 					carriedvalue += getMaterialValue(drop[0])
 			else:
 				carriedvalue += getMaterialValue(item.type)
+		# if a song is playing, do not interrupt
 		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song != "good_loot":
 			current_song = "good_loot"
 			#play the song

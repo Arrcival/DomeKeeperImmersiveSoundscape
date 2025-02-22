@@ -79,6 +79,18 @@ func generateCaveEffectPlayer() -> AudioStreamPlayer:
 	player.bus = BUS_CAVE_EFFECTS_NAME
 	return player
 
+func playTrack(track,delay:=0.0):
+	$Music.stop()
+	if currentTrackList.is_empty():
+		Logger.error("track list is empty", "Audio.startMusic")
+		return
+	$Music.stream = track
+	$Music.volume_db = 0
+	$MusicTween.stop_all()
+	$MusicTween.remove_all()
+	$MusicTween.interpolate_callback($Music, delay, "play")
+	$MusicTween.start()
+
 func startBattleMusic():
 	super.startBattleMusic()
 	# they all should start playing, even if they are muted
