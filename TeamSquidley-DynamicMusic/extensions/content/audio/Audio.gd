@@ -126,7 +126,7 @@ func stopBattleMusic():
 	super.stopBattleMusic()
 	# stop every players, but should fade off to be less abrupt
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
-		fade_out_music(player, 0.0, 2.0)
+		fade_out_music(player)
 
 #region Ambience
 func playAmbienceMine():
@@ -176,7 +176,7 @@ func set_music_based_on_strongest_monster(activate: bool):
 # Should be called on any hp changes
 func set_music_based_on_hp(hp: int, hp_loss: bool):
 	if hp_loss and hp < HP_CAP and not has_hp_faded_in:
-		fade_in_music(battleMusicTotalHp, 0.0, 1.5)
+		fade_in_music(battleMusicTotalHp)
 		has_hp_faded_in = true
 	else:
 		battleMusicTotalHp.volume_db = 0 if hp < HP_CAP else -60
@@ -184,13 +184,13 @@ func set_music_based_on_hp(hp: int, hp_loss: bool):
 		has_hp_faded_in = false
 
 # those method doesn't stop the players so they are still in sync
-func fade_out_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=6.0):
+func fade_out_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0):
 	if audioPlayer == null:
 		return
 	var tween = create_tween()
 	tween.tween_property(audioPlayer, "volume_db", -60, fade).set_trans(Tween.TRANS_LINEAR).set_delay(delay)
 
-func fade_in_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=6.0):
+func fade_in_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0):
 	if audioPlayer == null:
 		return
 	var tween = create_tween()
