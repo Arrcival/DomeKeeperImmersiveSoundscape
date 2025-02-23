@@ -4,7 +4,7 @@ const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.g
 
 var additionalMineAmbience: AudioStreamPlayer
 
-var battleMusicStartingSound: AudioStreamPlayer # based on wave number
+var battleMusicStartingSound: AudioStreamPlayer # based on wave number ?
 
 var battleMusicDefault: AudioStreamPlayer
 var battleMusicMonstersWeight: AudioStreamPlayer # monster amount
@@ -18,7 +18,7 @@ var battleMusicStrongestEnemy: AudioStreamPlayer # strongest enemy
 # intensity based on wave number ? monsters amount ? damage taken ? strongest enemy ?
 # outside dome variations? -> perhaps deafen monsters ?
 
-# Arbitrary number
+# Arbitrary numbers
 const WEIGHT_CAP1 := 5
 const WEIGHT_CAP2 := 8
 const HP_CAP := 600
@@ -111,7 +111,10 @@ func startBattleMusic():
 	set_music_based_on_monster_total_weight(0, false)
 	set_music_based_on_strongest_monster(false)
 	set_music_based_on_hp(CONSTMOD.getTotalHp(), false)
-	# manage volume/pitch there based on conditions
+	
+	weight1 = false
+	weight2 = false
+	heavy_monster_activated = false
 	
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		if player == battleMusicDefault and Data.of("wavemeter.showcounter") == true:
@@ -123,7 +126,7 @@ func stopBattleMusic():
 	super.stopBattleMusic()
 	# stop every players, but should fade off to be less abrupt
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
-		stop_music(player, 0.0, 2.0)
+		fade_out_music(player, 0.0, 2.0)
 
 #region Ambience
 func playAmbienceMine():
@@ -136,32 +139,52 @@ func stopAmbienceMine():
 #endregion
 
 # Should be called on monster spawn AND kill
+var weight1 = false
+var weight2 = false
 func set_music_based_on_monster_total_weight(monsters_amount: int, monster_killed: bool):
 	if monster_killed:
-		if monsters_amount < WEIGHT_CAP1:
-			stop_music(battleMusicMonstersWeight)
-		elif monsters_amount < WEIGHT_CAP2:
-			stop_music(battleMusicMonstersWeight2)
+		if monsters_amount < WEIGHT_CAP2:
+			weight2 = false
+			fade_out_music(battleMusicMonstersWeight2)
+		elif monsters_amount < WEIGHT_CAP1:
+			weight1 = false
+			fade_out_music(battleMusicMonstersWeight)
 	else:
-		battleMusicMonstersWeight2.volume_db = 0 if monsters_amount > WEIGHT_CAP2 else -60
-		battleMusicMonstersWeight.volume_db = 0 if monsters_amount > WEIGHT_CAP1 else -60
-		
+		if monsters_amount >= WEIGHT_CAP2 and not weight2:
+			weight2 = true
+			fade_in_music(battleMusicMonstersWeight2)
+		elif monsters_amount < WEIGHT_CAP2 and weight2:
+			weight2 = false
+			fade_out_music(battleMusicMonstersWeight2)
+		if monsters_amount >= WEIGHT_CAP1 and not weight1:
+			weight1 = true
+			fade_in_music(battleMusicMonstersWeight)
+		elif monsters_amount < WEIGHT_CAP1 and weight1:
+			weight1 = false
+			fade_out_music(battleMusicMonstersWeight)
 
-# Should be called on monster spawn AND kill
+# Should be called on heavy monster spawn
+var heavy_monster_activated = false
 func set_music_based_on_strongest_monster(activate: bool):
-	battleMusicStrongestEnemy.volume_db = 0 if activate else -60
+	if activate and not heavy_monster_activated:
+		fade_in_music(battleMusicStrongestEnemy)
+		heavy_monster_activated = true
+	if not activate and heavy_monster_activated:
+		fade_out_music(battleMusicStrongestEnemy)
+		heavy_monster_activated = false
 
 # Should be called on any hp changes
 func set_music_based_on_hp(hp: int, hp_loss: bool):
 	if hp_loss and hp < HP_CAP and not has_hp_faded_in:
-		fade_in_music(battleMusicTotalHp)
+		fade_in_music(battleMusicTotalHp, 0.0, 1.5)
 		has_hp_faded_in = true
 	else:
 		battleMusicTotalHp.volume_db = 0 if hp < HP_CAP else -60
 	if hp >= HP_CAP:
 		has_hp_faded_in = false
 
-func stop_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=6.0):
+# those method doesn't stop the players so they are still in sync
+func fade_out_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=6.0):
 	if audioPlayer == null:
 		return
 	var tween = create_tween()
