@@ -105,6 +105,7 @@ func startBattleMusic():
 	super.startBattleMusic()
 	# they all should start playing, even if they are muted
 	battleMusicDefault.volume_db = 0 # by default on
+	Audio.set_bus_volume("Music",0)
 
 	# initialize music layers with default values
 	set_music_based_on_monster_total_weight(0, false)
@@ -113,7 +114,10 @@ func startBattleMusic():
 	# manage volume/pitch there based on conditions
 	
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
-		player.play(0.0)
+		if player == battleMusicDefault and Data.of("wavemeter.showcounter") == true:
+			pass
+		else:
+			player.play(0.0)
 
 func stopBattleMusic():
 	super.stopBattleMusic()
@@ -139,8 +143,9 @@ func set_music_based_on_monster_total_weight(monsters_amount: int, monster_kille
 		elif monsters_amount < WEIGHT_CAP2:
 			stop_music(battleMusicMonstersWeight2)
 	else:
-		battleMusicMonstersWeight.volume_db = 0 if monsters_amount > WEIGHT_CAP1 else -60
 		battleMusicMonstersWeight2.volume_db = 0 if monsters_amount > WEIGHT_CAP2 else -60
+		battleMusicMonstersWeight.volume_db = 0 if monsters_amount > WEIGHT_CAP1 else -60
+		
 
 # Should be called on monster spawn AND kill
 func set_music_based_on_strongest_monster(activate: bool):

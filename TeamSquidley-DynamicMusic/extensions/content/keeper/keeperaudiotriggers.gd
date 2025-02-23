@@ -4,9 +4,12 @@ var current_song = null
 var time_between_waves = GameWorld.getTimeBetweenWaves()
 var time = 0
 var timewithoutmusic = 0
+var volume = 0
+var transitionsongtime = 0
 const layer1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-1.ogg")
 const layer2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-2.ogg")
 const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-3.ogg")
+var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new()
 func _process(delta):
 	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
@@ -16,30 +19,28 @@ func _process(delta):
 			current_song = null
 	else:
 		timewithoutmusic = 0
-	print(timewithoutmusic)
 	if time <= 15 and time > 1:
-		var faraway = 0
+		transitionsongtime += delta
 		for keeper in Keepers.getAll():
 			var keeperDist = keeper.global_position.length()
-			if keeperDist > 1000:
-				faraway = 3
-			elif keeperDist > 750:
-				faraway = 2
-			elif keeperDist > 500:
-				faraway = 1
-		if faraway != 0 and Data.of("wavemeter.showcounter") == true and (not Audio.isMusicPlaying() or current_song != "monsters_aproaching"):
+			volume = -(keeperDist/50)
+			Audio.set_bus_volume("Music",volume)
+		if Data.of("wavemeter.showcounter") == true and (not Audio.isMusicPlaying() and current_song != "monsters_aproaching"):
 			#play the song
 			current_song = "monsters_aproaching"
 			#These should be different ones depending on the faraway value
-			if faraway == 3:
-				Audio.playTrack(layer1,2.0)
-			elif faraway == 2:
-				Audio.playTrack(layer2,2.0)
-			elif faraway == 1:
-				Audio.playTrack(layer3,2.0)
-	elif time < 0.5:
-		Audio.stopMusic(0.0,3.0)
+			Audio.playTrack(layer1)
+			print("Playing")
+	elif time < 1:
 		current_song = null
+		if (volume + delta) >= 0:
+			Audio.set_bus_volume("Music",0)
+		else:
+			volume += delta
+			Audio.set_bus_volume("Music",volume)
+	elif time <= 0.2:
+		Audio.stopMusic(0,0)
+		print("PARALOOOOOOOOOOOOOOO")
 	elif carriedCarryables.size() >= 1:
 		var carriedvalue = 0
 		for item in carriedCarryables:
@@ -76,7 +77,7 @@ func getMaterialValue(material:String):
 		CONST.WATER:
 			return 2
 		CONST.SAND:
-			if (Data.of("dome.health")*100) / Data.of("dome.maxhealth") <= 25:
+			if (consts.getTotalHp()*100) / Data.of("dome.maxhealth") <= 25:
 				return 6
 			return 3
 		CONST.PACK:
