@@ -16,6 +16,7 @@ func _process(delta):
 			current_song = null
 	else:
 		timewithoutmusic = 0
+	print(timewithoutmusic)
 	if time <= 15 and time > 1:
 		var faraway = 0
 		for keeper in Keepers.getAll():
@@ -26,16 +27,16 @@ func _process(delta):
 				faraway = 2
 			elif keeperDist > 500:
 				faraway = 1
-		if not Audio.isMusicPlaying() or current_song != "monsters_aproaching" and faraway != 0 and Data.of("wavemeter.showbar") == true:
+		if faraway != 0 and Data.of("wavemeter.showcounter") == true and (not Audio.isMusicPlaying() or current_song != "monsters_aproaching"):
 			#play the song
 			current_song = "monsters_aproaching"
 			#These should be different ones depending on the faraway value
 			if faraway == 3:
-				Audio.playTrack(layer1)
+				Audio.playTrack(layer1,2.0)
 			elif faraway == 2:
-				Audio.playTrack(layer2)
+				Audio.playTrack(layer2,2.0)
 			elif faraway == 1:
-				Audio.playTrack(layer3)
+				Audio.playTrack(layer3,2.0)
 	elif time < 0.5:
 		Audio.stopMusic(0.0,3.0)
 		current_song = null
