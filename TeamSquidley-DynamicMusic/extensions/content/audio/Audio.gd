@@ -21,7 +21,7 @@ var battleMusicStrongestEnemy: AudioStreamPlayer # strongest enemy
 # Arbitrary numbers
 const WEIGHT_CAP1 := 5
 const WEIGHT_CAP2 := 8
-const HP_CAP := 600
+const HP_CAP := 400
 
 var allBattleMusicsPlayers: Array[AudioStreamPlayer]
 
@@ -124,9 +124,10 @@ func startBattleMusic():
 
 func stopBattleMusic():
 	super.stopBattleMusic()
-	# stop every players, but should fade off to be less abrupt
+	# stop every music, but should fade off to be less abrupt
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		fade_out_music(player)
+		stop_music(player)
 
 #region Ambience
 func playAmbienceMine():
@@ -189,6 +190,13 @@ func fade_out_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0):
 		return
 	var tween = create_tween()
 	tween.tween_property(audioPlayer, "volume_db", -60, fade).set_trans(Tween.TRANS_LINEAR).set_delay(delay)
+
+func stop_music(audioPlayer: AudioStreamPlayer, delay:=0.0):
+	if audioPlayer == null:
+		return
+	var tween = create_tween()
+	tween.tween_callback(audioPlayer.stop).set_delay(delay)
+
 
 func fade_in_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0):
 	if audioPlayer == null:

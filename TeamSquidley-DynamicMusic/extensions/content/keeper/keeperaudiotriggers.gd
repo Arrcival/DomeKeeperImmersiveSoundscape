@@ -1,5 +1,7 @@
 extends "res://content/keeper/keeper1/Keeper1.gd"
+
 @onready var Audio = get_node("/root/Audio")
+
 var current_song = null
 var time_between_waves = GameWorld.getTimeBetweenWaves()
 var time = 0
@@ -9,7 +11,9 @@ var transitionsongtime = 0
 const layer1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-1.ogg")
 const layer2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-2.ogg")
 const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-3.ogg")
+
 var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new()
+
 func _process(delta):
 	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
@@ -73,6 +77,14 @@ func _process(delta):
 			player.bus = &"Mine"
 			player.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water.ogg")
 			player.play()
+
+func getReverbEffectOrNull() -> AudioEffectReverb:
+	for i in range(AudioServer.get_bus_effect_count(Audio.BUS_MUSIC)):
+		var effect = AudioServer.get_bus_effect(Audio.BUS_MUSIC, i)
+		if effect is AudioEffectReverb:
+			return effect
+	return null
+
 func getMaterialValue(material:String):
 	match material:
 		CONST.POWERCORE:
@@ -88,7 +100,8 @@ func getMaterialValue(material:String):
 		CONST.WATER:
 			return 2
 		CONST.SAND:
-			if (consts.getTotalHp()*100) / Data.of("dome.maxhealth") <= 25:
+			# warning : doesn't consider cobalts or revives
+			if (consts.getTotalHp() * 100) / Data.of("dome.maxhealth") <= 25:
 				return 6
 			return 3
 		CONST.PACK:
