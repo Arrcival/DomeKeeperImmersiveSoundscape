@@ -17,6 +17,7 @@ var player_battleMusicStrongestEnemy: AudioStreamPlayer # strongest enemy
 # intensity based on wave number ? monsters amount ? damage taken ? strongest enemy ?
 # outside dome variations? -> perhaps deafen monsters ?
 
+var player_additional_music: AudioStreamPlayer
 var player_droplet: AudioStreamPlayer
 
 # Arbitrary numbers
@@ -51,6 +52,8 @@ func _ready():
 	
 	
 	#region Creating and registering audio players
+	player_additional_music = generateMusicPlayer()
+	
 	player_battleMusicStartingSound = generateMusicPlayer()
 	player_battleMusicDefault = generateMusicPlayer()
 	player_battleMusicDefault.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 1.mp3")
@@ -79,7 +82,8 @@ func _ready():
 	
 	player_droplet = generateCaveEffectPlayer()
 	player_droplet.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water.ogg")
-	
+	player_droplet.volume_db = -5
+	add_child(player_droplet)
 	#endregion
 	
 	# add effects to that bus
@@ -105,24 +109,23 @@ func generateCaveEffectPlayer() -> AudioStreamPlayer:
 	player.volume_db = 0
 	return player
 
-func playTrack(track,delay:=0.0):
-	$Music.stop()
+func playTrack(track, delay:=0.0):
+	player_additional_music.stop()
 	if currentTrackList.is_empty():
 		Logger.error("track list is empty", "Audio.startMusic")
 		return
-	$Music.stream = track
-	$Music.volume_db = 0
-	$MusicTween.stop_all()
-	$MusicTween.remove_all()
-	$MusicTween.interpolate_callback($Music, delay, "play")
-	$MusicTween.start()
+	player_additional_music.stream = track
+	player_additional_music.volume_db = 0
+	var tween: Tween = create_tween()
+	tween.tween_callback(player_additional_music.play)
+	tween.tween_property($Music, "volume_db", -60, delay)
+	tween.tween_callback($Music.play).set_delay(delay)
 
 #region Battle music
 func startBattleMusic():
 	super.startBattleMusic()
 	# they all should start playing, even if they are muted
 	player_battleMusicDefault.volume_db = 0 # by default on
-	Audio.set_bus_volume("Music",0)
 
 	# initialize music layers with default values
 	set_music_based_on_monster_total_weight(0, false)
@@ -134,10 +137,7 @@ func startBattleMusic():
 	heavy_monster_activated = false
 	
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
-		if player == player_battleMusicDefault and Data.of("wavemeter.showcounter") == true:
-			pass
-		else:
-			player.play(0.0)
+		player.play(0.0)
 
 func stopBattleMusic():
 	super.stopBattleMusic()
@@ -203,17 +203,23 @@ func set_music_based_on_hp(hp: int, hp_loss: bool):
 	if hp >= HP_CAP:
 		has_hp_faded_in = false
 
-func play_droplet_sound(magnitude: float):
+func play_droplet_sound(room_scale: float):
 	if player_droplet.playing:
 		return
-	var reverb: AudioEffectReverb = getReverbEffectOrNull(BUS_CAVE_EFFECTS_ID)
+	var reverb: AudioEffectReverb = removeReverbEffectOrNull(BUS_CAVE_EFFECTS_ID)
 	if reverb != null:
-		reverb.room_size = magnitude
+		reverb.room_size = room_scale
+	else:
+		reverb = AudioEffectReverb.new()
+	player_droplet.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
+	player_droplet.volume_db = -(room_scale * 10) # Placeholder
+	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, reverb)
 	player_droplet.play()
 
-func getReverbEffectOrNull(bus_id: int) -> AudioEffectReverb:
+func removeReverbEffectOrNull(bus_id: int) -> AudioEffectReverb:
 	for i in range(AudioServer.get_bus_effect_count(bus_id)):
 		var effect = AudioServer.get_bus_effect(bus_id, i)
+		AudioServer.remove_bus_effect(bus_id,i)
 		if effect is AudioEffectReverb:
 			return effect
 	return null
@@ -238,4 +244,9 @@ func fade_in_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0):
 		return
 	var tween = create_tween()
 	tween.tween_property(audioPlayer, "volume_db", 0, fade).set_trans(Tween.TRANS_LINEAR).set_delay(delay)
+#endregion
+
+#region Additional music
+func isAdditionalMusicPlaying() -> bool:
+	return player_additional_music.playing and player_additional_music.volume_db > -40
 #endregion

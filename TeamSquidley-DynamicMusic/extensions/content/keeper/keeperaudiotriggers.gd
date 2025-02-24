@@ -14,14 +14,15 @@ const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Trac
 
 var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new()
 
-const DROPLET_THRESHOLD: int = 100
+const DROPLET_THRESHOLD: int = 400
+const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 
-const DROPLET_CHANCE_PER_FRAME: float = 0.05
+const DROPLET_CHANCE_PER_FRAME: float = 0.002
 
 func _process(delta):
 	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
-	if not Audio.isMusicPlaying() and current_song != null:
+	if not Audio.isAdditionalMusicPlaying() and current_song != null:
 		timewithoutmusic += delta
 		if timewithoutmusic > 3:
 			current_song = null
@@ -31,8 +32,8 @@ func _process(delta):
 		transitionsongtime += delta
 		for keeper in Keepers.getAll():
 			var keeperDist = keeper.global_position.length()
-			volume = -(keeperDist/50)
-			Audio.set_bus_volume("Music",volume)
+			volume = -(keeperDist / 50)
+			Audio.set_bus_volume("Music", volume)
 		if Data.of("wavemeter.showcounter") == true and (not Audio.isMusicPlaying() and current_song != "monsters_aproaching"):
 			#play the song
 			current_song = "monsters_aproaching"
@@ -77,8 +78,9 @@ func _process_droplets():
 	if keeper_distance_to_dome >= DROPLET_THRESHOLD:
 		var random = randf()
 		if random < DROPLET_CHANCE_PER_FRAME:
-			var magnitude = -keeper_distance_to_dome / 50
-			Audio.should_droplet_sound.emit(magnitude)
+			# Should be between 0-1
+			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
+			Audio.should_droplet_sound.emit(room_scale * 2)
 
 func getMaterialValue(material:String):
 	match material:
