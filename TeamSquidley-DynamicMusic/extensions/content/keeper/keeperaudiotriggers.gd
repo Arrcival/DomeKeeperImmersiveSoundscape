@@ -56,6 +56,19 @@ func _process(delta):
 			carriedvalue = 0
 			Audio.stopMusic(0.0,3.0)
 			current_song = null
+	if randf() < 0.0001:
+		print("entroo")
+		for keeper in Keepers.getAll():
+			var keeperDist = keeper.global_position.length()
+			var reverb = AudioEffectReverb.new()
+			var magnitude = -(keeperDist/50)
+			reverb.room_size = magnitude
+			AudioServer.add_bus_effect(AudioServer.get_bus_index(Audio.BUS_MUSIC),reverb)
+			var player = AudioStreamPlayer.new()
+			player.autoplay = false
+			player.bus = &"Mine"
+			player.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water.ogg")
+			player.play()
 	else:
 		#if you drop to 1 or 0 materials, the song fades away
 		Audio.stopMusic(0.0,3.0)
