@@ -30,7 +30,6 @@ func _process(delta):
 			current_song = "monsters_aproaching"
 			#These should be different ones depending on the faraway value
 			Audio.playTrack(layer1)
-			print("Playing")
 	elif time < 1:
 		current_song = null
 		if (volume + delta) >= 0:
@@ -40,7 +39,6 @@ func _process(delta):
 			Audio.set_bus_volume("Music",volume)
 	elif time <= 0.2:
 		Audio.stopMusic(0,0)
-		print("PARALOOOOOOOOOOOOOOO")
 	elif carriedCarryables.size() >= 1:
 		var carriedvalue = 0
 		for item in carriedCarryables:
