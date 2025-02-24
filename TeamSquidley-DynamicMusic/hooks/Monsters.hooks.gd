@@ -4,7 +4,6 @@ var hasBigMonsterSpawned: bool = false
 
 var enemiesWeight = 0
 var heavyMonstersNames : Array[String] = ["hornet"]
-var ticklist = []
 func spawnWave(chain: ModLoaderHookChain):
 	chain.execute_next()
 	hasBigMonsterSpawned = false
@@ -27,7 +26,6 @@ func _spawnMonster(chain: ModLoaderHookChain, breed:String, variant:String, grou
 
 func monsterDied(chain: ModLoaderHookChain, m):
 	chain.execute_next([m])
-	print(m.scene_file_path)
 	var main_node : Node = chain.reference_object
 	if m.scene_file_path == "res://content/monster/tick/Tick.tscn" or m.scene_file_path == "res://content/monster/bigtick/Bigticker.tscn" :
 		enemiesWeight -= 0.05
