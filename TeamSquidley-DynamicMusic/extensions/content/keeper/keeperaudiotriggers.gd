@@ -56,8 +56,12 @@ func _process(delta):
 			carriedvalue = 0
 			Audio.stopMusic(0.0,3.0)
 			current_song = null
-	if randf() < 0.0001:
-		print("entroo")
+	else:
+		#if you drop to 1 or 0 materials, the song fades away
+		Audio.stopMusic(0.0,3.0)
+		current_song = null
+	#base of what some drip sound could be (doesn't work by the way, somerhing to do with the player
+	if randf() < 0.0001 and Keepers.getAll()[0].global_position.length() > 500:
 		for keeper in Keepers.getAll():
 			var keeperDist = keeper.global_position.length()
 			var reverb = AudioEffectReverb.new()
@@ -69,10 +73,6 @@ func _process(delta):
 			player.bus = &"Mine"
 			player.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water.ogg")
 			player.play()
-	else:
-		#if you drop to 1 or 0 materials, the song fades away
-		Audio.stopMusic(0.0,3.0)
-		current_song = null
 func getMaterialValue(material:String):
 	match material:
 		CONST.POWERCORE:
