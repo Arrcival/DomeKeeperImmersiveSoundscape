@@ -14,6 +14,10 @@ const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Trac
 
 var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new()
 
+const DROPLET_THRESHOLD: int = 100
+
+const DROPLET_CHANCE_PER_FRAME: float = 0.05
+
 func _process(delta):
 	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
@@ -64,26 +68,17 @@ func _process(delta):
 		#if you drop to 1 or 0 materials, the song fades away
 		Audio.stopMusic(0.0,3.0)
 		current_song = null
-	#base of what some drip sound could be (doesn't work by the way, somerhing to do with the player
-	if randf() < 0.0001 and Keepers.getAll()[0].global_position.length() > 500:
-		for keeper in Keepers.getAll():
-			var keeperDist = keeper.global_position.length()
-			var reverb = AudioEffectReverb.new()
-			var magnitude = -(keeperDist/50)
-			reverb.room_size = magnitude
-			AudioServer.add_bus_effect(AudioServer.get_bus_index(Audio.BUS_MUSIC),reverb)
-			var player = AudioStreamPlayer.new()
-			player.autoplay = false
-			player.bus = &"Mine"
-			player.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water.ogg")
-			player.play()
+		
+	_process_droplets()
 
-func getReverbEffectOrNull() -> AudioEffectReverb:
-	for i in range(AudioServer.get_bus_effect_count(Audio.BUS_MUSIC)):
-		var effect = AudioServer.get_bus_effect(Audio.BUS_MUSIC, i)
-		if effect is AudioEffectReverb:
-			return effect
-	return null
+func _process_droplets():
+	#base of what some drip sound could be (doesn't work by the way, somerhing to do with the player
+	var keeper_distance_to_dome = global_position.length()
+	if keeper_distance_to_dome >= DROPLET_THRESHOLD:
+		var random = randf()
+		if random < DROPLET_CHANCE_PER_FRAME:
+			var magnitude = -keeper_distance_to_dome / 50
+			Audio.should_droplet_sound.emit(magnitude)
 
 func getMaterialValue(material:String):
 	match material:
