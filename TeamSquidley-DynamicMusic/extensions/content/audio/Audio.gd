@@ -37,6 +37,14 @@ const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water13.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water14.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water15.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble6.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble7.ogg"),
+
 ]
 # Arbitrary numbers
 const WEIGHT_CAP1 := 5
@@ -248,7 +256,6 @@ func play_abstract_sound(room_scale: float):
 	player_droplet.volume_db = -(room_scale * 10) # Placeholder
 	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, reverb)
 	player_droplet.stream = abstractTrack
-	print("playing")
 	player_droplet.play(randf_range(0,145))
 	fade_in_music(player_droplet,0,1)
 	fade_out_music(player_droplet,5,2)
