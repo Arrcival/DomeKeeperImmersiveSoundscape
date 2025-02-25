@@ -61,7 +61,6 @@ func _process_carriable() -> void:
 	# to an another player
 	if current_song == MUSIC_TYPE.MONSTERS_APPROACHING:
 		return
-	print(carriedCarryables)
 	if carriedCarryables.size() >= 1:
 		var carriedvalue = 0
 		for item in carriedCarryables:
