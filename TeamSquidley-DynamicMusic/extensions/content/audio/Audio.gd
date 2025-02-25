@@ -215,9 +215,9 @@ func set_music_based_on_monster_total_weight(monsters_amount: int, monster_kille
 			fade_out_music(player_battleMusicMonstersWeight)
 	print(monsters_amount,CONSTMOD.getTotalHp())
 	if monsters_amount >= WEIGHT_CAP2 and CONSTMOD.getTotalHp() <= 500:
-		stopBattleMusic()
-		print("aca")
 		player_heartbeat.play()
+	else:
+		player_heartbeat.stop()
 # Should be called on heavy monster spawn
 var heavy_monster_activated = false
 func set_music_based_on_strongest_monster(activate: bool):
