@@ -18,7 +18,7 @@ var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new
 const DROPLET_THRESHOLD: int = 400
 const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 
-const DROPLET_CHANCE_PER_FRAME: float = 0.002
+const DROPLET_CHANCE_PER_FRAME: float = 0.001
 
 
 func _process(delta):

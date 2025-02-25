@@ -19,7 +19,23 @@ var player_battleMusicStrongestEnemy: AudioStreamPlayer # strongest enemy
 
 var player_additional_music: AudioStreamPlayer
 var player_droplet: AudioStreamPlayer
-
+const dropletsounds = [
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water6.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water7.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water8.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water9.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water10.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water11.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water12.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water13.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water14.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water15.ogg")
+]
 # Arbitrary numbers
 const WEIGHT_CAP1 := 5
 const WEIGHT_CAP2 := 8
@@ -81,7 +97,6 @@ func _ready():
 	]
 	
 	player_droplet = generateCaveEffectPlayer()
-	player_droplet.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water.ogg")
 	player_droplet.volume_db = -5
 	add_child(player_droplet)
 	#endregion
@@ -214,6 +229,7 @@ func play_droplet_sound(room_scale: float):
 	player_droplet.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
 	player_droplet.volume_db = -(room_scale * 10) # Placeholder
 	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, reverb)
+	player_droplet.stream = dropletsounds[randi() % dropletsounds.size()]
 	player_droplet.play()
 
 func removeReverbEffectOrNull(bus_id: int) -> AudioEffectReverb:
