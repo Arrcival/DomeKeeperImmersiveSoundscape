@@ -15,7 +15,8 @@ func _init(modLoader = ModLoader):
 	
 	# Add extensions
 	loadExtension(ext_dir, "content/audio/Audio.gd")
-	loadExtension(ext_dir, "content/keeper/keeperaudiotriggers.gd")
+	loadExtension(ext_dir, "content/keeper/engineeraudiotriggers.gd")
+	loadExtension(ext_dir, "content/keeper/assesoraudiotriggers.gd")
 	loadExtension(ext_dir, "content/projectiles/DirectProjectile.gd")
 	loadExtension(ext_dir, "content/projectiles/PathProjectile.gd")
 	

@@ -1,4 +1,4 @@
-extends "res://content/keeper/keeper1/Keeper1.gd"
+extends "res://content/keeper/keeper2/Keeper2.gd"
 
 @onready var Audio = get_node("/root/Audio")
 
@@ -61,11 +61,10 @@ func _process_carriable() -> void:
 	# to an another player
 	if current_song == MUSIC_TYPE.MONSTERS_APPROACHING:
 		return
-	
+	print(carriedCarryables)
 	if carriedCarryables.size() >= 1:
 		var carriedvalue = 0
 		for item in carriedCarryables:
-			print(is_instance_of(item,Drop))
 			if not is_instance_of(item,Drop):
 				return
 			if item.type == CONST.PACK:
