@@ -20,6 +20,7 @@ const ABSTRACT_THRESHOLD: int = 600
 const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 
 const DROPLET_CHANCE_PER_FRAME: float = 0.0005
+const ABSTRACT_CHANCE_PER_FRAME: float = 0.0000025
 
 
 func _process(delta):
@@ -95,7 +96,7 @@ func _process_abstract() -> void:
 	var keeper_distance_to_dome = global_position.length()
 	if keeper_distance_to_dome >= ABSTRACT_THRESHOLD and GameWorld.paused == false:
 		var random = randf()
-		if random < DROPLET_CHANCE_PER_FRAME:
+		if random < ABSTRACT_CHANCE_PER_FRAME:
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
 			print("emiti señal")
