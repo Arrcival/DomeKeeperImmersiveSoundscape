@@ -109,17 +109,17 @@ func generateCaveEffectPlayer() -> AudioStreamPlayer:
 	player.volume_db = 0
 	return player
 
-func playTrack(track, delay:=0.0):
-	player_additional_music.stop()
+func playMusicTrack(track, delay:=0.0):
+	$Music.stop()
 	if currentTrackList.is_empty():
-		Logger.error("track list is empty", "Audio.startMusic")
+		Logger.error("track list is empty", "Audio.playMusicTrack")
 		return
-	player_additional_music.stream = track
-	player_additional_music.volume_db = 0
-	var tween: Tween = create_tween()
-	tween.tween_callback(player_additional_music.play)
-	tween.tween_property($Music, "volume_db", -60, delay)
-	tween.tween_callback($Music.play).set_delay(delay)
+	$Music.stream = track
+	$Music.volume_db = 0
+	$MusicTween.stop_all()
+	$MusicTween.remove_all()
+	$MusicTween.interpolate_callback($Music, delay, "play")
+	$MusicTween.start()
 
 #region Battle music
 func startBattleMusic():
@@ -247,6 +247,22 @@ func fade_in_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0):
 #endregion
 
 #region Additional music
-func isAdditionalMusicPlaying() -> bool:
-	return player_additional_music.playing and player_additional_music.volume_db > -40
+var isFadingOut = false
+func fade_out_music_bus(fade :float = 1.0):
+	if isFadingOut:
+		return
+	isFadingOut = true
+	var tween = create_tween()
+	tween.tween_property($Music, "volume_db", -60, fade)
+	tween.tween_property(self, "isFadingOut", false, 0.0).set_delay(fade)
+
+var isFadingIn = false
+func fade_in_music_bus(fade :float = 1.0):
+	if isFadingIn:
+		return
+	isFadingIn = true
+	var tween = create_tween()
+	tween.tween_property($Music, "volume_db", 0, fade)
+	tween.tween_property(self, "isFadingIn", false, 0.0).set_delay(fade)
+
 #endregion

@@ -2,7 +2,8 @@ extends "res://content/keeper/keeper1/Keeper1.gd"
 
 @onready var Audio = get_node("/root/Audio")
 
-var current_song = null
+enum MUSIC_TYPE { NONE = 0, MONSTERS_APPROACHING = 1, GOOD_LOOT = 2 }
+var current_song : MUSIC_TYPE = MUSIC_TYPE.NONE
 var time_between_waves = GameWorld.getTimeBetweenWaves()
 var time = 0
 var timewithoutmusic = 0
@@ -19,61 +20,68 @@ const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 
 const DROPLET_CHANCE_PER_FRAME: float = 0.002
 
+
 func _process(delta):
 	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
-	if not Audio.isAdditionalMusicPlaying() and current_song != null:
-		timewithoutmusic += delta
-		if timewithoutmusic > 3:
-			current_song = null
-	else:
-		timewithoutmusic = 0
+
+	# Fade music anyway before-brebattle music
+	if time <= 16 && time > 15:
+		Audio.fade_out_music_bus()
 	if time <= 15 and time > 1:
-		transitionsongtime += delta
-		for keeper in Keepers.getAll():
-			var keeperDist = keeper.global_position.length()
-			volume = -(keeperDist / 50)
-			Audio.set_bus_volume("Music", volume)
-		if Data.of("wavemeter.showcounter") == true and (not Audio.isMusicPlaying() and current_song != "monsters_aproaching"):
-			#play the song
-			current_song = "monsters_aproaching"
-			#These should be different ones depending on the faraway value
-			Audio.playTrack(layer1)
+		_process_approching_music()
 	elif time < 1:
-		current_song = null
-		if (volume + delta) >= 0:
-			Audio.set_bus_volume("Music",0)
-		else:
-			volume += delta
-			Audio.set_bus_volume("Music",volume)
-	elif time <= 0.2:
-		Audio.stopMusic(0,0)
-	elif carriedCarryables.size() >= 1:
+		current_song = MUSIC_TYPE.NONE
+		Audio.fade_out_music_bus()
+
+	_process_carriable()
+	_process_droplets()
+
+func _process_approching_music():
+	# Current song is currently correct !
+	if current_song == MUSIC_TYPE.MONSTERS_APPROACHING:
+		return
+	# Do not own bar -> no music
+	if not Data.of("wavemeter.showcounter"):
+		return
+	var keeperDist = global_position.length()
+	# The more the further, the quieter the music
+	volume = -(keeperDist / 50)
+	Audio.fade_in_music_bus()
+	current_song = MUSIC_TYPE.MONSTERS_APPROACHING
+	#These should be different ones depending on the faraway value
+	Audio.playMusicTrack(layer1)
+
+func _process_carriable() -> void:
+	# We do not process any loot music if there's approaching monsters
+	# Unless the loot become ambient, but then should probably be moved
+	# to an another player
+	if current_song == MUSIC_TYPE.MONSTERS_APPROACHING:
+		return
+	
+	if carriedCarryables.size() >= 1:
 		var carriedvalue = 0
-		for item in carriedCarryables:
-			if getMaterialValue(item.type) == 99:
+		for item: Drop in carriedCarryables:
+			if item.type == CONST.PACK:
 				for drop in item.dropData:
 					carriedvalue += getMaterialValue(drop[0])
 			else:
 				carriedvalue += getMaterialValue(item.type)
 		# if a song is playing, do not interrupt
-		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song != "good_loot":
-			current_song = "good_loot"
+		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song != MUSIC_TYPE.GOOD_LOOT:
+			current_song = MUSIC_TYPE.GOOD_LOOT
 			#play the song
-			Audio.startMusic(1,3.0)
-		elif carriedvalue < 9:
+			Audio.startMusic(1, 3.0)
+		elif carriedvalue < 9 and current_song == MUSIC_TYPE.GOOD_LOOT:
 			carriedvalue = 0
-			Audio.stopMusic(0.0,3.0)
-			current_song = null
-	else:
+			Audio.stopMusic(0.0, 3.0)
+			current_song = MUSIC_TYPE.NONE
+	elif current_song == MUSIC_TYPE.GOOD_LOOT:
 		#if you drop to 1 or 0 materials, the song fades away
 		Audio.stopMusic(0.0,3.0)
-		current_song = null
-		
-	_process_droplets()
+		current_song = MUSIC_TYPE.NONE
 
-func _process_droplets():
-	#base of what some drip sound could be (doesn't work by the way, somerhing to do with the player
+func _process_droplets() -> void:
 	var keeper_distance_to_dome = global_position.length()
 	if keeper_distance_to_dome >= DROPLET_THRESHOLD:
 		var random = randf()
