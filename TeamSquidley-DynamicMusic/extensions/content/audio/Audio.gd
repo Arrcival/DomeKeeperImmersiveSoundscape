@@ -3,7 +3,6 @@ extends "res://systems/audio/Audio.gd"
 const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd")
 
 var additionalMineAmbience: AudioStreamPlayer
-
 var player_battleMusicStartingSound: AudioStreamPlayer # based on wave number ?
 
 var player_battleMusicDefault: AudioStreamPlayer
@@ -13,6 +12,8 @@ var player_battleMusicMonstersWeight2: AudioStreamPlayer # monster amount
 # amount of life + cobalt * heal < threshold -> plays music ?
 var player_battleMusicTotalHp: AudioStreamPlayer # % of life AND considering cobalt
 var player_battleMusicStrongestEnemy: AudioStreamPlayer # strongest enemy
+
+var player_heartbeat: AudioStreamPlayer # critical situation
 
 # intensity based on wave number ? monsters amount ? damage taken ? strongest enemy ?
 # outside dome variations? -> perhaps deafen monsters ?
@@ -81,6 +82,8 @@ func _ready():
 	#region Creating and registering audio players
 	player_additional_music = generateMusicPlayer()
 	
+	player_heartbeat = generateMusicPlayer()
+	player_heartbeat.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/heartbeat.ogg")
 	player_battleMusicStartingSound = generateMusicPlayer()
 	player_battleMusicDefault = generateMusicPlayer()
 	player_battleMusicDefault.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 1.mp3")
@@ -97,6 +100,7 @@ func _ready():
 	add_child(player_battleMusicMonstersWeight2)
 	add_child(player_battleMusicTotalHp)
 	add_child(player_battleMusicStrongestEnemy)
+	add_child(player_heartbeat)
 	
 	allBattleMusicsPlayers = [
 		player_battleMusicStartingSound,
@@ -209,7 +213,11 @@ func set_music_based_on_monster_total_weight(monsters_amount: int, monster_kille
 		elif monsters_amount < WEIGHT_CAP1 and weight1:
 			weight1 = false
 			fade_out_music(player_battleMusicMonstersWeight)
-
+	print(monsters_amount,CONSTMOD.getTotalHp())
+	if monsters_amount >= WEIGHT_CAP2 and CONSTMOD.getTotalHp() <= 500:
+		stopBattleMusic()
+		print("aca")
+		player_heartbeat.play()
 # Should be called on heavy monster spawn
 var heavy_monster_activated = false
 func set_music_based_on_strongest_monster(activate: bool):

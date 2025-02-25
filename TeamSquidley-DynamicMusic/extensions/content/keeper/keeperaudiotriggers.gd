@@ -64,7 +64,10 @@ func _process_carriable() -> void:
 	
 	if carriedCarryables.size() >= 1:
 		var carriedvalue = 0
-		for item: Drop in carriedCarryables:
+		for item in carriedCarryables:
+			print(is_instance_of(item,Drop))
+			if not is_instance_of(item,Drop):
+				return
 			if item.type == CONST.PACK:
 				for drop in item.dropData:
 					carriedvalue += getMaterialValue(drop[0])
