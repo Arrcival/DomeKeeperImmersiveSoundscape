@@ -83,7 +83,7 @@ func _ready():
 	#region Creating and registering audio players
 	player_additional_music = generateMusicPlayer()
 	
-	player_heartbeat = generateMusicPlayer()
+	player_heartbeat = generatePlayer(&"Ambience", 0, false)
 	player_heartbeat.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/heartbeat.ogg")
 	player_battleMusicStartingSound = generateMusicPlayer()
 	player_battleMusicDefault = generateMusicPlayer()
@@ -126,13 +126,19 @@ func _ready():
 	should_abstract_sound.connect(play_abstract_sound)
 	hp_change.connect(set_music_based_on_hp)
 	
-#func muffleAudio():
-	#var lowpass: AudioEffectLowPassFilter = removeLowPassEffectOrNull(AudioServer.get_bus_index("Master"))
-	#if lowpass != null:
-		#pass
-	#else:
-		#lowpass = AudioEffectLowPassFilter.new()
-	#AudioServer.add_bus_effect(AudioServer.get_bus_index("Master"),lowpass)
+func muffleAudio():
+	print("audio muffled")
+	var lowpass: AudioEffectLowPassFilter = removeLowPassEffectOrNull(AudioServer.get_bus_index("Master"))
+	if lowpass != null:
+		pass
+	else:
+		lowpass = AudioEffectLowPassFilter.new()
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"),-10)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"),-10)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"),-10)
+	AudioServer.add_bus_effect(AudioServer.get_bus_index("Monster"),lowpass)
+	AudioServer.add_bus_effect(AudioServer.get_bus_index("Music"),lowpass)
+	AudioServer.add_bus_effect(AudioServer.get_bus_index("Sounds"),lowpass)
 	
 
 func generateMusicPlayer() -> AudioStreamPlayer:
@@ -251,18 +257,24 @@ func set_music_based_on_hp(hp: int, hp_loss: bool):
 
 var isHeartbeatPlaying = false
 func _check_heartbeat() -> void:
+	print(Data.of("game.over"))
 	if monstersAmount >= WEIGHT_CAP2 and CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying:
 		player_heartbeat.volume_db = -60
 		player_heartbeat.play()
 		fade_in_music(player_heartbeat, 0.0, 1.0)
 		isHeartbeatPlaying = true
-		#muffleAudio()
-	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500:
+		muffleAudio()
+	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500 or CONSTMOD.getTotalHp() <= 0:
 		if isHeartbeatPlaying:
 			isHeartbeatPlaying = false
 			fade_out_music(player_heartbeat, 0.0, 1.0)
 			stop_music(player_heartbeat, 1.0)
-			#AudioServer.remove_bus_effect(AudioServer.get_bus_index("Master"),-1)
+			removeLowPassEffectOrNull(AudioServer.get_bus_index("Master"))
+			removeLowPassEffectOrNull(AudioServer.get_bus_index("Sounds"))
+			removeLowPassEffectOrNull(AudioServer.get_bus_index("Monster"))
+			AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"),0)
+			AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"),0)
+			AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"),0)
 func play_droplet_sound(room_scale: float):
 	if player_droplet.playing:
 		return
@@ -300,14 +312,12 @@ func removeReverbEffectOrNull(bus_id: int) -> AudioEffectReverb:
 		if effect is AudioEffectReverb:
 			return effect
 	return null
-#func removeLowPassEffectOrNull(bus_id: int) -> AudioEffectLowPassFilter:
-	#for i in range(AudioServer.get_bus_effect_count(bus_id)):
-		#var effect = AudioServer.get_bus_effect(bus_id, i)
-		#AudioServer.remove_bus_effect(bus_id,i)
-		#if effect is AudioEffectLowPassFilter:
-			#return effect
-	#return null
-#endregion
+func removeLowPassEffectOrNull(bus_id: int) -> AudioEffectLowPassFilter:
+	for i in range(AudioServer.get_bus_effect_count(bus_id)):
+		var effect = AudioServer.get_bus_effect(bus_id, i)
+		if effect is AudioEffectLowPassFilter:
+			AudioServer.remove_bus_effect(bus_id,i)
+	return null
 
 #region Start & Stops
 # those method doesn't stop the players so they are still in sync
