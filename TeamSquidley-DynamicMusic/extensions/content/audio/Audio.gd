@@ -125,6 +125,15 @@ func _ready():
 	should_droplet_sound.connect(play_droplet_sound)
 	should_abstract_sound.connect(play_abstract_sound)
 	hp_change.connect(set_music_based_on_hp)
+	
+#func muffleAudio():
+	#var lowpass: AudioEffectLowPassFilter = removeLowPassEffectOrNull(AudioServer.get_bus_index("Master"))
+	#if lowpass != null:
+		#pass
+	#else:
+		#lowpass = AudioEffectLowPassFilter.new()
+	#AudioServer.add_bus_effect(AudioServer.get_bus_index("Master"),lowpass)
+	
 
 func generateMusicPlayer() -> AudioStreamPlayer:
 	return generatePlayer(&"Music", -60, false)
@@ -247,12 +256,13 @@ func _check_heartbeat() -> void:
 		player_heartbeat.play()
 		fade_in_music(player_heartbeat, 0.0, 1.0)
 		isHeartbeatPlaying = true
+		#muffleAudio()
 	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500:
 		if isHeartbeatPlaying:
 			isHeartbeatPlaying = false
 			fade_out_music(player_heartbeat, 0.0, 1.0)
 			stop_music(player_heartbeat, 1.0)
-
+			#AudioServer.remove_bus_effect(AudioServer.get_bus_index("Master"),-1)
 func play_droplet_sound(room_scale: float):
 	if player_droplet.playing:
 		return
@@ -290,6 +300,13 @@ func removeReverbEffectOrNull(bus_id: int) -> AudioEffectReverb:
 		if effect is AudioEffectReverb:
 			return effect
 	return null
+#func removeLowPassEffectOrNull(bus_id: int) -> AudioEffectLowPassFilter:
+	#for i in range(AudioServer.get_bus_effect_count(bus_id)):
+		#var effect = AudioServer.get_bus_effect(bus_id, i)
+		#AudioServer.remove_bus_effect(bus_id,i)
+		#if effect is AudioEffectLowPassFilter:
+			#return effect
+	#return null
 #endregion
 
 #region Start & Stops
