@@ -19,6 +19,8 @@ var player_battleMusicStrongestEnemy: AudioStreamPlayer # strongest enemy
 
 var player_additional_music: AudioStreamPlayer
 var player_droplet: AudioStreamPlayer
+
+const abstractTrack = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/abstractsounds.wav")
 const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2.ogg"),
@@ -34,7 +36,7 @@ const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water12.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water13.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water14.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water15.ogg")
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water15.ogg"),
 ]
 # Arbitrary numbers
 const WEIGHT_CAP1 := 5
@@ -50,6 +52,7 @@ signal monsters_total_change(value: int, kill: bool)
 signal monsters_big_monster_spawn(activate: bool)
 signal hp_change(value: int, hp_loss: bool)
 signal should_droplet_sound(reverb_magnitude: float)
+signal should_abstract_sound(reverb_magnitude: float)
 
 var has_hp_faded_in: bool = false
 
@@ -107,6 +110,7 @@ func _ready():
 	monsters_total_change.connect(set_music_based_on_monster_total_weight)
 	monsters_big_monster_spawn.connect(set_music_based_on_strongest_monster)
 	should_droplet_sound.connect(play_droplet_sound)
+	should_abstract_sound.connect(play_abstract_sound)
 	hp_change.connect(set_music_based_on_hp)
 
 func generateMusicPlayer() -> AudioStreamPlayer:
@@ -231,6 +235,23 @@ func play_droplet_sound(room_scale: float):
 	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, reverb)
 	player_droplet.stream = dropletsounds[randi() % dropletsounds.size()]
 	player_droplet.play()
+
+func play_abstract_sound(room_scale: float):
+	if player_droplet.playing:
+		return
+	var reverb: AudioEffectReverb = removeReverbEffectOrNull(BUS_CAVE_EFFECTS_ID)
+	if reverb != null:
+		reverb.room_size = room_scale
+	else:
+		reverb = AudioEffectReverb.new()
+	player_droplet.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
+	player_droplet.volume_db = -(room_scale * 10) # Placeholder
+	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, reverb)
+	player_droplet.stream = abstractTrack
+	print("playing")
+	player_droplet.play(randf_range(0,145))
+	fade_in_music(player_droplet,0,1)
+	fade_out_music(player_droplet,5,2)
 
 func removeReverbEffectOrNull(bus_id: int) -> AudioEffectReverb:
 	for i in range(AudioServer.get_bus_effect_count(bus_id)):

@@ -16,9 +16,10 @@ const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Trac
 var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new()
 
 const DROPLET_THRESHOLD: int = 400
+const ABSTRACT_THRESHOLD: int = 600
 const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 
-const DROPLET_CHANCE_PER_FRAME: float = 0.001
+const DROPLET_CHANCE_PER_FRAME: float = 0.0005
 
 
 func _process(delta):
@@ -36,6 +37,7 @@ func _process(delta):
 
 	_process_carriable()
 	_process_droplets()
+	_process_abstract()
 
 func _process_approching_music():
 	# Current song is currently correct !
@@ -83,12 +85,21 @@ func _process_carriable() -> void:
 
 func _process_droplets() -> void:
 	var keeper_distance_to_dome = global_position.length()
-	if keeper_distance_to_dome >= DROPLET_THRESHOLD:
+	if keeper_distance_to_dome >= DROPLET_THRESHOLD and GameWorld.paused == false:
 		var random = randf()
 		if random < DROPLET_CHANCE_PER_FRAME:
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
 			Audio.should_droplet_sound.emit(room_scale * 2)
+func _process_abstract() -> void:
+	var keeper_distance_to_dome = global_position.length()
+	if keeper_distance_to_dome >= ABSTRACT_THRESHOLD and GameWorld.paused == false:
+		var random = randf()
+		if random < DROPLET_CHANCE_PER_FRAME:
+			# Should be between 0-1
+			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
+			print("emiti señal")
+			Audio.should_abstract_sound.emit(room_scale * 2)
 
 func getMaterialValue(material:String):
 	match material:
