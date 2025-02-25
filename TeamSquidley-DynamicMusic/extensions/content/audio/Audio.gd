@@ -21,6 +21,8 @@ var player_heartbeat: AudioStreamPlayer # critical situation
 var player_additional_music: AudioStreamPlayer
 var player_droplet: AudioStreamPlayer
 
+var monstersAmount: int = 0
+
 const abstractTrack = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/abstractsounds.wav")
 const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1.ogg"),
@@ -69,7 +71,7 @@ var MusicTween: Tween
 
 func _ready():
 	super._ready()
-	
+
 	#region Buscreation
 	AudioServer.add_bus(BUS_CAVE_EFFECTS_ID)
 	AudioServer.set_bus_name(BUS_CAVE_EFFECTS_ID, BUS_CAVE_EFFECTS_NAME)
@@ -77,8 +79,7 @@ func _ready():
 	var reverb = AudioEffectReverb.new()
 	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, reverb)
 	#endregion
-	
-	
+
 	#region Creating and registering audio players
 	player_additional_music = generateMusicPlayer()
 	
@@ -117,7 +118,7 @@ func _ready():
 	#endregion
 	
 	# add effects to that bus
-	
+
 	MusicTween = create_tween()
 	monsters_total_change.connect(set_music_based_on_monster_total_weight)
 	monsters_big_monster_spawn.connect(set_music_based_on_strongest_monster)
@@ -126,18 +127,18 @@ func _ready():
 	hp_change.connect(set_music_based_on_hp)
 
 func generateMusicPlayer() -> AudioStreamPlayer:
-	var player: AudioStreamPlayer = AudioStreamPlayer.new()
-	player.autoplay = false
-	player.bus = &"Music"
-	player.volume_db = -60
-	player.stop()
-	return player
+	return generatePlayer(&"Music", -60, false)
 	
 func generateCaveEffectPlayer() -> AudioStreamPlayer:
+	return generatePlayer(BUS_CAVE_EFFECTS_NAME, 0, true)
+
+func generatePlayer(bus_name: String, initial_volume: float, is_playing: bool = false) -> AudioStreamPlayer:
 	var player: AudioStreamPlayer = AudioStreamPlayer.new()
 	player.autoplay = false
-	player.bus = BUS_CAVE_EFFECTS_NAME
-	player.volume_db = 0
+	player.bus = bus_name
+	player.volume_db = initial_volume
+	if not is_playing:
+		player.stop()
 	return player
 
 func playMusicTrack(track, delay:=0.0):
@@ -193,6 +194,7 @@ func stopAmbienceMine():
 var weight1 = false
 var weight2 = false
 func set_music_based_on_monster_total_weight(monsters_amount: int, monster_killed: bool):
+	monstersAmount = monsters_amount
 	if monster_killed:
 		if monsters_amount < WEIGHT_CAP2:
 			weight2 = false
@@ -214,10 +216,9 @@ func set_music_based_on_monster_total_weight(monsters_amount: int, monster_kille
 			weight1 = false
 			fade_out_music(player_battleMusicMonstersWeight)
 	print(monsters_amount,CONSTMOD.getTotalHp())
-	if monsters_amount >= WEIGHT_CAP2 and CONSTMOD.getTotalHp() <= 500:
-		player_heartbeat.play()
-	else:
-		player_heartbeat.stop()
+	_check_heartbeat()
+
+
 # Should be called on heavy monster spawn
 var heavy_monster_activated = false
 func set_music_based_on_strongest_monster(activate: bool):
@@ -237,6 +238,20 @@ func set_music_based_on_hp(hp: int, hp_loss: bool):
 		player_battleMusicTotalHp.volume_db = 0 if hp < HP_CAP else -60
 	if hp >= HP_CAP:
 		has_hp_faded_in = false
+	_check_heartbeat()
+
+var isHeartbeatPlaying = false
+func _check_heartbeat() -> void:
+	if monstersAmount >= WEIGHT_CAP2 and CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying:
+		player_heartbeat.volume_db = -60
+		player_heartbeat.play()
+		fade_in_music(player_heartbeat, 0.0, 1.0)
+		isHeartbeatPlaying = true
+	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500:
+		if isHeartbeatPlaying:
+			isHeartbeatPlaying = false
+			fade_out_music(player_heartbeat, 0.0, 1.0)
+			stop_music(player_heartbeat, 1.0)
 
 func play_droplet_sound(room_scale: float):
 	if player_droplet.playing:
