@@ -128,15 +128,15 @@ func _ready():
 	gameover.connect(gameOver)
 	should_abstract_sound.connect(play_abstract_sound)
 	hp_change.connect(set_music_based_on_hp)
-<<<<<<< Updated upstream
+#<<<<<<< Updated upstream
 
 
 var audioMuffled = false
-=======
+#=======
 func gameOver():
 	
 	stopHeartbeat()
->>>>>>> Stashed changes
+#>>>>>>> Stashed changes
 func muffleAudio():
 	print("audio muffled")
 	if audioMuffled:
@@ -286,7 +286,7 @@ func _check_heartbeat() -> void:
 		fade_in_music(player_heartbeat, 0.0, 1.0)
 		isHeartbeatPlaying = true
 		muffleAudio()
-<<<<<<< Updated upstream
+#<<<<<<< Updated upstream
 	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500 or CONSTMOD.getTotalHp() <= 0:
 		if isHeartbeatPlaying:
 			isHeartbeatPlaying = false
@@ -294,7 +294,7 @@ func _check_heartbeat() -> void:
 			stop_music(player_heartbeat, 1.0)
 			removeMuffle()
 
-=======
+#=======
 	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500:
 		stopHeartbeat()
 func stopHeartbeat():
@@ -308,7 +308,7 @@ func stopHeartbeat():
 		AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"),0)
 		AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"),0)
 		AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"),0)
->>>>>>> Stashed changes
+#>>>>>>> Stashed changes
 func play_droplet_sound(room_scale: float):
 	if player_droplet.playing:
 		return

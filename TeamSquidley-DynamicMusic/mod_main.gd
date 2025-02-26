@@ -23,6 +23,7 @@ func _init(modLoader = ModLoader):
 	# Find a way to not have the Monsters hook
 	loadHook("res://content/dome/Dome.gd", hooks_dir, "Dome.hooks.gd")
 	loadHook("res://content/monster/Monsters.gd", hooks_dir, "Monsters.hooks.gd")
+	loadHook("res://game/GameWorld.gd", hooks_dir, "GameWorld.hooks.gd")
 	
 	ModLoaderLog.info("init done", MYMODNAME_LOG)
 
