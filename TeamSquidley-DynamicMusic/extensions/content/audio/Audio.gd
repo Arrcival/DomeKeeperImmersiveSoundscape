@@ -64,6 +64,7 @@ signal monsters_big_monster_spawn(activate: bool)
 signal hp_change(value: int, hp_loss: bool)
 signal should_droplet_sound(reverb_magnitude: float)
 signal should_abstract_sound(reverb_magnitude: float)
+signal gameover()
 
 var has_hp_faded_in: bool = false
 
@@ -124,11 +125,18 @@ func _ready():
 	monsters_total_change.connect(set_music_based_on_monster_total_weight)
 	monsters_big_monster_spawn.connect(set_music_based_on_strongest_monster)
 	should_droplet_sound.connect(play_droplet_sound)
+	gameover.connect(gameOver)
 	should_abstract_sound.connect(play_abstract_sound)
 	hp_change.connect(set_music_based_on_hp)
+<<<<<<< Updated upstream
 
 
 var audioMuffled = false
+=======
+func gameOver():
+	
+	stopHeartbeat()
+>>>>>>> Stashed changes
 func muffleAudio():
 	print("audio muffled")
 	if audioMuffled:
@@ -272,13 +280,13 @@ func set_music_based_on_hp(hp: int, hp_loss: bool):
 
 var isHeartbeatPlaying = false
 func _check_heartbeat() -> void:
-	print(Data.of("game.over"))
 	if monstersAmount >= WEIGHT_CAP2 and CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying:
 		player_heartbeat.volume_db = -60
 		player_heartbeat.play()
 		fade_in_music(player_heartbeat, 0.0, 1.0)
 		isHeartbeatPlaying = true
 		muffleAudio()
+<<<<<<< Updated upstream
 	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500 or CONSTMOD.getTotalHp() <= 0:
 		if isHeartbeatPlaying:
 			isHeartbeatPlaying = false
@@ -286,6 +294,21 @@ func _check_heartbeat() -> void:
 			stop_music(player_heartbeat, 1.0)
 			removeMuffle()
 
+=======
+	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500:
+		stopHeartbeat()
+func stopHeartbeat():
+	if isHeartbeatPlaying:
+		isHeartbeatPlaying = false
+		fade_out_music(player_heartbeat, 0.0, 1.0)
+		stop_music(player_heartbeat, 1.0)
+		removeLowPassEffectOrNull(AudioServer.get_bus_index("Master"))
+		removeLowPassEffectOrNull(AudioServer.get_bus_index("Sounds"))
+		removeLowPassEffectOrNull(AudioServer.get_bus_index("Monster"))
+		AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"),0)
+		AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"),0)
+		AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"),0)
+>>>>>>> Stashed changes
 func play_droplet_sound(room_scale: float):
 	if player_droplet.playing:
 		return
