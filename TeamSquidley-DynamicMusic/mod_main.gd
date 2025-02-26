@@ -15,15 +15,15 @@ func _init(modLoader = ModLoader):
 	
 	# Add extensions
 	loadExtension(ext_dir, "content/audio/Audio.gd")
+	loadExtension(ext_dir, "game/GameWorld.gd")
 	loadExtension(ext_dir, "content/keeper/engineeraudiotriggers.gd")
-	loadExtension(ext_dir, "content/keeper/assesoraudiotriggers.gd")
+	loadExtension(ext_dir, "content/keeper/assessoraudiotriggers.gd")
 	loadExtension(ext_dir, "content/projectiles/DirectProjectile.gd")
 	loadExtension(ext_dir, "content/projectiles/PathProjectile.gd")
 	
 	# Find a way to not have the Monsters hook
 	loadHook("res://content/dome/Dome.gd", hooks_dir, "Dome.hooks.gd")
 	loadHook("res://content/monster/Monsters.gd", hooks_dir, "Monsters.hooks.gd")
-	loadHook("res://game/GameWorld.gd", hooks_dir, "GameWorld.hooks.gd")
 	loadHook("res://content/caves/Cave.gd", hooks_dir, "Cave.hooks.gd")
 	
 	ModLoaderLog.info("init done", MYMODNAME_LOG)

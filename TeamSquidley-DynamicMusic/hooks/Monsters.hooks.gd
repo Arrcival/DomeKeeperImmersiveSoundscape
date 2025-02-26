@@ -20,9 +20,9 @@ func _spawnMonster(chain: ModLoaderHookChain, breed:String, variant:String, grou
 	if heavyMonstersNames.has(breed) and not hasBigMonsterSpawned:
 		# play audio
 		hasBigMonsterSpawned = true
-		Audio.monsters_big_monster_spawn.emit(true)
+		Audio.set_music_based_on_strongest_monster.emit(true)
 	
-	Audio.monsters_total_change.emit(enemiesWeight, false)
+	Audio.set_music_based_on_monster_amount(enemiesWeight, false)
 
 func monsterDied(chain: ModLoaderHookChain, m):
 	chain.execute_next([m])
@@ -31,4 +31,4 @@ func monsterDied(chain: ModLoaderHookChain, m):
 		enemiesWeight -= 0.05
 	else:
 		enemiesWeight -= 1
-	Audio.monsters_total_change.emit(enemiesWeight, true)
+	Audio.set_music_based_on_monster_amount(enemiesWeight, true)

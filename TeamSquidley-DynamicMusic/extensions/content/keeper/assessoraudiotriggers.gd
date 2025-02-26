@@ -32,7 +32,7 @@ func _process(delta):
 	if time <= 16 && time > 15:
 		Audio.fade_out_music_bus()
 	if time <= 15 and time > 14.5 and Data.of("wavemeter.showcounter"):
-		Audio.preroundintro.emit()
+		Audio.playHorn()
 	if time <= 14 and time > 1:
 		_process_approching_music()
 	elif time < 1:
@@ -54,7 +54,7 @@ func _process_approching_music():
 	# The further you are, the quieter the music
 	volume = -(keeperDist / 50)
 	current_song = MUSIC_TYPE.MONSTERS_APPROACHING
-	Audio.preroundintroloop.emit()
+	Audio.preRoundIntroLoop()
 
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
@@ -95,7 +95,8 @@ func _process_droplets() -> void:
 		if random < DROPLET_CHANCE_PER_FRAME:
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
-			Audio.should_droplet_sound.emit(room_scale * 2)
+			Audio.play_droplet_sound(room_scale * 2)
+
 func _process_abstract() -> void:
 	var keeper_distance_to_dome = global_position.length()
 	if keeper_distance_to_dome >= ABSTRACT_THRESHOLD and GameWorld.paused == false:
@@ -103,7 +104,7 @@ func _process_abstract() -> void:
 		if random < ABSTRACT_CHANCE_PER_FRAME:
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
-			Audio.should_abstract_sound.emit(room_scale * 2)
+			Audio.play_abstract_sound(room_scale * 2)
 
 func getMaterialValue(material:String):
 	match material:

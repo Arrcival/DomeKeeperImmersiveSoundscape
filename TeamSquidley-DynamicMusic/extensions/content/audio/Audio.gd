@@ -62,19 +62,7 @@ var allBattleMusicsPlayers: Array[AudioStreamPlayer]
 const BUS_CAVE_EFFECTS_NAME := "CaveEffects"
 const BUS_CAVE_EFFECTS_ID := 1
 
-signal monsters_total_change(value: int, kill: bool)
-signal monsters_big_monster_spawn(activate: bool)
-signal hp_change(value: int, hp_loss: bool)
-signal should_droplet_sound(reverb_magnitude: float)
-signal should_abstract_sound(reverb_magnitude: float)
-signal gameover()
-signal preroundintro()
-signal preroundintroloop(play: bool)
-signal preroundintroloopvolume(volume)
-
 var has_hp_faded_in: bool = false
-
-var MusicTween: Tween
 
 func _ready():
 	super._ready()
@@ -135,37 +123,33 @@ func _ready():
 	player_discovery.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/discovering.mp3")
 	add_child(player_discovery)
 	#endregion
-	
-	# add effects to that bus
 
-	MusicTween = create_tween()
-	monsters_total_change.connect(set_music_based_on_monster_total_weight)
-	monsters_big_monster_spawn.connect(set_music_based_on_strongest_monster)
-	should_droplet_sound.connect(play_droplet_sound)
-	gameover.connect(gameOver)
-	preroundintro.connect(preRoundIntro)
-	preroundintroloop.connect(preRoundIntroLoop)
-	preroundintroloopvolume.connect(preRoundIntroLoopVolume)
-	should_abstract_sound.connect(play_abstract_sound)
-	hp_change.connect(set_music_based_on_hp)
-
-
-var audioMuffled = false
 func playDiscovery():
 	if not player_discovery.playing:
 		player_discovery.play()
-func preRoundIntro():
+
+#region Pre round
+var hasHornPlayed = false
+func playHorn():
+	if hasHornPlayed:
+		return
+	hasHornPlayed = true
 	player_preroundintrosound.play()
+
 func preRoundIntroLoop(play:bool):
 	if play:
 		player_preroundintrosoundloop.play()
 	else:
 		fade_out_music(player_preroundintrosoundloop,0,1)
-func preRoundIntroLoopVolume(volume):
+
+func setPreRoundMusicVolume(volume):
 	player_preroundintrosoundloop.volume_db += volume
-		
+#endregion
+
 func gameOver():
 	removeMuffle()
+
+var audioMuffled = false
 func muffleAudio():
 	if audioMuffled:
 		return
@@ -226,10 +210,11 @@ func startBattleMusic():
 	player_battleMusicDefault.volume_db = 0 # by default on
 
 	# initialize music layers with default values
-	set_music_based_on_monster_total_weight(0, false)
+	set_music_based_on_monster_amount(0, false)
 	set_music_based_on_strongest_monster(false)
 	set_music_based_on_hp(CONSTMOD.getTotalHp(), false)
 	
+	hasHornPlayed = false
 	weight1 = false
 	weight2 = false
 	heavy_monster_activated = false
@@ -259,7 +244,7 @@ func stopAmbienceMine():
 # Should be called on monster spawn AND kill
 var weight1 = false
 var weight2 = false
-func set_music_based_on_monster_total_weight(monsters_amount: int, monster_killed: bool):
+func set_music_based_on_monster_amount(monsters_amount: int, monster_killed: bool):
 	monstersAmount = monsters_amount
 	if monster_killed:
 		if monsters_amount < WEIGHT_CAP2:
