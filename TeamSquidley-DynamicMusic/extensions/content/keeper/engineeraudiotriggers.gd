@@ -6,6 +6,7 @@ enum MUSIC_TYPE { NONE = 0, MONSTERS_APPROACHING = 1, GOOD_LOOT = 2 }
 var current_song : MUSIC_TYPE = MUSIC_TYPE.NONE
 var time_between_waves = GameWorld.getTimeBetweenWaves()
 var time = 0
+var lasttime = 0
 var timewithoutmusic = 0
 var volume = 0
 var transitionsongtime = 0
@@ -32,7 +33,7 @@ func _process(delta):
 	if time <= 15 and time > 14.5 and Data.of("wavemeter.showcounter"):
 		Audio.preroundintro.emit()
 	if time <= 14 and time > 1:
-		_process_approching_music()
+		_process_approching_music(delta)
 	elif time < 1:
 		current_song = MUSIC_TYPE.NONE
 		Audio.preroundintroloop.emit(false)
@@ -42,16 +43,20 @@ func _process(delta):
 	_process_droplets()
 	_process_abstract()
 
-func _process_approching_music():
+func _process_approching_music(delta):
 	# Current song is currently correct !
+	if not GameWorld.paused:
+		Audio.preroundintroloopvolume.emit(delta)
+	print("aca1")
+	print(current_song)
 	if current_song == MUSIC_TYPE.MONSTERS_APPROACHING:
 		return
+	print("aca2")
 	# Do not own bar -> no music
 	if not Data.of("wavemeter.showcounter"):
 		return
 	var keeperDist = global_position.length()
 	# The further you are, the quieter the music
-	volume = -(keeperDist / 50)
 	current_song = MUSIC_TYPE.MONSTERS_APPROACHING
 	Audio.preroundintroloop.emit(true)
 
@@ -85,7 +90,6 @@ func _process_carriable() -> void:
 	elif current_song == MUSIC_TYPE.GOOD_LOOT:
 		#if you drop to 1 or 0 materials, the song fades away
 		Audio.stopMusic(0.0,3.0)
-		Audio.preroundintroloop.emit(true)
 		current_song = MUSIC_TYPE.NONE
 
 func _process_droplets() -> void:

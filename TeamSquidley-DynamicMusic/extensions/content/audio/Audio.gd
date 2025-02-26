@@ -69,6 +69,7 @@ signal should_abstract_sound(reverb_magnitude: float)
 signal gameover()
 signal preroundintro()
 signal preroundintroloop(play: bool)
+signal preroundintroloopvolume(volume)
 
 var has_hp_faded_in: bool = false
 
@@ -95,7 +96,7 @@ func _ready():
 	player_preroundintrosound.volume_db = 0
 	player_preroundintrosound.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(intro).ogg")
 	player_preroundintrosoundloop = generatePlayer(&"Music", 0, false)
-	player_preroundintrosoundloop.volume_db = 0
+	player_preroundintrosoundloop.volume_db = -10
 	player_preroundintrosoundloop.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg")
 	player_battleMusicStartingSound = generateMusicPlayer()
 	player_battleMusicDefault = generateMusicPlayer()
@@ -140,6 +141,7 @@ func _ready():
 	gameover.connect(gameOver)
 	preroundintro.connect(preRoundIntro)
 	preroundintroloop.connect(preRoundIntroLoop)
+	preroundintroloopvolume.connect(preRoundIntroLoopVolume)
 	should_abstract_sound.connect(play_abstract_sound)
 	hp_change.connect(set_music_based_on_hp)
 
@@ -148,11 +150,13 @@ var audioMuffled = false
 func preRoundIntro():
 	player_preroundintrosound.play()
 func preRoundIntroLoop(play:bool):
-	Audio.fade_in_music_bus(2)
 	if play:
 		player_preroundintrosoundloop.play()
 	else:
 		fade_out_music(player_preroundintrosoundloop,0,1)
+func preRoundIntroLoopVolume(volume):
+	player_preroundintrosoundloop.volume_db += volume
+		
 func gameOver():
 	removeMuffle()
 func muffleAudio():
