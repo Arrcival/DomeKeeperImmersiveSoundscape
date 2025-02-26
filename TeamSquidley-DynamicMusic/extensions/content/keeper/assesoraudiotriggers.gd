@@ -9,6 +9,7 @@ var time = 0
 var timewithoutmusic = 0
 var volume = 0
 var transitionsongtime = 0
+const prewave = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg")
 const layer1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-1.ogg")
 const layer2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-2.ogg")
 const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-3.ogg")
@@ -30,7 +31,9 @@ func _process(delta):
 	# Fade music anyway before-brebattle music
 	if time <= 16 && time > 15:
 		Audio.fade_out_music_bus()
-	if time <= 15 and time > 1:
+	if time <= 15 and time > 14.5 and Data.of("wavemeter.showcounter"):
+		Audio.preroundintro.emit()
+	if time <= 14 and time > 1:
 		_process_approching_music()
 	elif time < 1:
 		current_song = MUSIC_TYPE.NONE
@@ -48,12 +51,10 @@ func _process_approching_music():
 	if not Data.of("wavemeter.showcounter"):
 		return
 	var keeperDist = global_position.length()
-	# The more the further, the quieter the music
+	# The further you are, the quieter the music
 	volume = -(keeperDist / 50)
-	Audio.fade_in_music_bus()
 	current_song = MUSIC_TYPE.MONSTERS_APPROACHING
-	#These should be different ones depending on the faraway value
-	Audio.playMusicTrack(layer1)
+	Audio.preroundintroloop.emit()
 
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
@@ -70,6 +71,8 @@ func _process_carriable() -> void:
 				for drop in item.dropData:
 					carriedvalue += getMaterialValue(drop[0])
 			else:
+				if getMaterialValue(item.type) == null:
+					return
 				carriedvalue += getMaterialValue(item.type)
 		# if a song is playing, do not interrupt
 		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song != MUSIC_TYPE.GOOD_LOOT:
