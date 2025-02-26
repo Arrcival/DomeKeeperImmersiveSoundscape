@@ -84,7 +84,7 @@ func _ready():
 	#region Creating and registering audio players
 	player_additional_music = generateMusicPlayer()
 	
-	player_heartbeat = generatePlayer(&"Ambience", 0, false)
+	player_heartbeat = generatePlayer(&"UI", 0, false)
 	player_heartbeat.volume_db = 5
 	player_heartbeat.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/heartbeat.ogg")
 	player_battleMusicStartingSound = generateMusicPlayer()
@@ -128,17 +128,12 @@ func _ready():
 	gameover.connect(gameOver)
 	should_abstract_sound.connect(play_abstract_sound)
 	hp_change.connect(set_music_based_on_hp)
-#<<<<<<< Updated upstream
 
 
 var audioMuffled = false
-#=======
 func gameOver():
-	
-	stopHeartbeat()
-#>>>>>>> Stashed changes
+	removeMuffle()
 func muffleAudio():
-	print("audio muffled")
 	if audioMuffled:
 		return
 	audioMuffled = true
@@ -154,6 +149,7 @@ func muffleAudio():
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("Sounds"),lowpass)
 
 func removeMuffle():
+	
 	if not audioMuffled:
 		return
 	audioMuffled = false
@@ -253,7 +249,6 @@ func set_music_based_on_monster_total_weight(monsters_amount: int, monster_kille
 		elif monsters_amount < WEIGHT_CAP1 and weight1:
 			weight1 = false
 			fade_out_music(player_battleMusicMonstersWeight)
-	print(monsters_amount,CONSTMOD.getTotalHp())
 	_check_heartbeat()
 
 
@@ -286,7 +281,6 @@ func _check_heartbeat() -> void:
 		fade_in_music(player_heartbeat, 0.0, 1.0)
 		isHeartbeatPlaying = true
 		muffleAudio()
-#<<<<<<< Updated upstream
 	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500 or CONSTMOD.getTotalHp() <= 0:
 		if isHeartbeatPlaying:
 			isHeartbeatPlaying = false
@@ -294,21 +288,9 @@ func _check_heartbeat() -> void:
 			stop_music(player_heartbeat, 1.0)
 			removeMuffle()
 
-#=======
 	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500:
-		stopHeartbeat()
-func stopHeartbeat():
-	if isHeartbeatPlaying:
-		isHeartbeatPlaying = false
-		fade_out_music(player_heartbeat, 0.0, 1.0)
-		stop_music(player_heartbeat, 1.0)
-		removeLowPassEffectOrNull(AudioServer.get_bus_index("Master"))
-		removeLowPassEffectOrNull(AudioServer.get_bus_index("Sounds"))
-		removeLowPassEffectOrNull(AudioServer.get_bus_index("Monster"))
-		AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"),0)
-		AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"),0)
-		AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"),0)
-#>>>>>>> Stashed changes
+		removeMuffle()
+		
 func play_droplet_sound(room_scale: float):
 	if player_droplet.playing:
 		return
