@@ -22,6 +22,7 @@ var player_preroundintrosoundloop: AudioStreamPlayer # beofre round starts loop
 
 var player_additional_music: AudioStreamPlayer
 var player_droplet: AudioStreamPlayer
+var player_discovery: AudioStreamPlayer
 
 var monstersAmount: int = 0
 
@@ -130,6 +131,9 @@ func _ready():
 	player_droplet = generateCaveEffectPlayer()
 	player_droplet.volume_db = -5
 	add_child(player_droplet)
+	player_discovery = generatePlayer(&"Sounds",0,false)
+	player_discovery.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/discovering.mp3")
+	add_child(player_discovery)
 	#endregion
 	
 	# add effects to that bus
@@ -147,6 +151,9 @@ func _ready():
 
 
 var audioMuffled = false
+func playDiscovery():
+	if not player_discovery.playing:
+		player_discovery.play()
 func preRoundIntro():
 	player_preroundintrosound.play()
 func preRoundIntroLoop(play:bool):
