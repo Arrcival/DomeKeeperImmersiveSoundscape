@@ -23,11 +23,9 @@ const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 const DROPLET_CHANCE_PER_FRAME: float = 0.0005
 const ABSTRACT_CHANCE_PER_FRAME: float = 0.0000025
 
-
 func _process(delta):
-	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
-
+	# TEST: If size is greater or equal than 2 play the song
 	# Fade music anyway before-brebattle music
 	if time <= 16 && time > 15:
 		Audio.fade_out_music_bus()
@@ -37,6 +35,7 @@ func _process(delta):
 		_process_approching_music()
 	elif time < 1:
 		current_song = MUSIC_TYPE.NONE
+		Audio.preroundintroloop.emit(false)
 		Audio.fade_out_music_bus()
 
 	_process_carriable()
@@ -54,7 +53,7 @@ func _process_approching_music():
 	# The further you are, the quieter the music
 	volume = -(keeperDist / 50)
 	current_song = MUSIC_TYPE.MONSTERS_APPROACHING
-	Audio.preroundintroloop.emit()
+	Audio.preroundintroloop.emit(true)
 
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
@@ -86,6 +85,7 @@ func _process_carriable() -> void:
 	elif current_song == MUSIC_TYPE.GOOD_LOOT:
 		#if you drop to 1 or 0 materials, the song fades away
 		Audio.stopMusic(0.0,3.0)
+		Audio.preroundintroloop.emit(true)
 		current_song = MUSIC_TYPE.NONE
 
 func _process_droplets() -> void:

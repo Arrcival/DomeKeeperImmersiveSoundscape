@@ -68,7 +68,7 @@ signal should_droplet_sound(reverb_magnitude: float)
 signal should_abstract_sound(reverb_magnitude: float)
 signal gameover()
 signal preroundintro()
-signal preroundintroloop()
+signal preroundintroloop(play: bool)
 
 var has_hp_faded_in: bool = false
 
@@ -89,7 +89,7 @@ func _ready():
 	player_additional_music = generateMusicPlayer()
 	
 	player_heartbeat = generatePlayer(&"UI", 0, false)
-	player_heartbeat.volume_db = 5
+	player_heartbeat.volume_db = 15
 	player_heartbeat.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/heartbeat.ogg")
 	player_preroundintrosound = generatePlayer(&"Sounds", 0, false)
 	player_preroundintrosound.volume_db = 0
@@ -147,9 +147,12 @@ func _ready():
 var audioMuffled = false
 func preRoundIntro():
 	player_preroundintrosound.play()
-func preRoundIntroLoop():
+func preRoundIntroLoop(play:bool):
 	Audio.fade_in_music_bus(2)
-	player_preroundintrosoundloop.play()
+	if play:
+		player_preroundintrosoundloop.play()
+	else:
+		fade_out_music(player_preroundintrosoundloop,0,1)
 func gameOver():
 	removeMuffle()
 func muffleAudio():
@@ -168,7 +171,6 @@ func muffleAudio():
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("Sounds"),lowpass)
 
 func removeMuffle():
-	
 	if not audioMuffled:
 		return
 	audioMuffled = false
