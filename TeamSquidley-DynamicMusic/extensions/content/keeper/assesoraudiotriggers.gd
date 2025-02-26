@@ -61,7 +61,6 @@ func _process_carriable() -> void:
 	# to an another player
 	if current_song == MUSIC_TYPE.MONSTERS_APPROACHING:
 		return
-	print(carriedCarryables)
 	if carriedCarryables.size() >= 1:
 		var carriedvalue = 0
 		for item in carriedCarryables:
@@ -101,7 +100,6 @@ func _process_abstract() -> void:
 		if random < ABSTRACT_CHANCE_PER_FRAME:
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
-			print("emiti señal")
 			Audio.should_abstract_sound.emit(room_scale * 2)
 
 func getMaterialValue(material:String):

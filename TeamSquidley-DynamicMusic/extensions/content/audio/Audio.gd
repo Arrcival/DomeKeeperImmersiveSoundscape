@@ -14,6 +14,8 @@ var player_battleMusicTotalHp: AudioStreamPlayer # % of life AND considering cob
 var player_battleMusicStrongestEnemy: AudioStreamPlayer # strongest enemy
 
 var player_heartbeat: AudioStreamPlayer # critical situation
+var player_preroundintrosound: AudioStreamPlayer # beofre round starts sound
+var player_preroundintrosoundloop: AudioStreamPlayer # beofre round starts loop
 
 # intensity based on wave number ? monsters amount ? damage taken ? strongest enemy ?
 # outside dome variations? -> perhaps deafen monsters ?
@@ -65,6 +67,8 @@ signal hp_change(value: int, hp_loss: bool)
 signal should_droplet_sound(reverb_magnitude: float)
 signal should_abstract_sound(reverb_magnitude: float)
 signal gameover()
+signal preroundintro()
+signal preroundintroloop()
 
 var has_hp_faded_in: bool = false
 
@@ -87,6 +91,12 @@ func _ready():
 	player_heartbeat = generatePlayer(&"UI", 0, false)
 	player_heartbeat.volume_db = 5
 	player_heartbeat.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/heartbeat.ogg")
+	player_preroundintrosound = generatePlayer(&"Sounds", 0, false)
+	player_preroundintrosound.volume_db = 0
+	player_preroundintrosound.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(intro).ogg")
+	player_preroundintrosoundloop = generatePlayer(&"Music", 0, false)
+	player_preroundintrosoundloop.volume_db = 0
+	player_preroundintrosoundloop.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg")
 	player_battleMusicStartingSound = generateMusicPlayer()
 	player_battleMusicDefault = generateMusicPlayer()
 	player_battleMusicDefault.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 1.mp3")
@@ -104,6 +114,8 @@ func _ready():
 	add_child(player_battleMusicTotalHp)
 	add_child(player_battleMusicStrongestEnemy)
 	add_child(player_heartbeat)
+	add_child(player_preroundintrosound)
+	add_child(player_preroundintrosoundloop)
 	
 	allBattleMusicsPlayers = [
 		player_battleMusicStartingSound,
@@ -126,11 +138,18 @@ func _ready():
 	monsters_big_monster_spawn.connect(set_music_based_on_strongest_monster)
 	should_droplet_sound.connect(play_droplet_sound)
 	gameover.connect(gameOver)
+	preroundintro.connect(preRoundIntro)
+	preroundintroloop.connect(preRoundIntroLoop)
 	should_abstract_sound.connect(play_abstract_sound)
 	hp_change.connect(set_music_based_on_hp)
 
 
 var audioMuffled = false
+func preRoundIntro():
+	player_preroundintrosound.play()
+func preRoundIntroLoop():
+	Audio.fade_in_music_bus(2)
+	player_preroundintrosoundloop.play()
 func gameOver():
 	removeMuffle()
 func muffleAudio():
