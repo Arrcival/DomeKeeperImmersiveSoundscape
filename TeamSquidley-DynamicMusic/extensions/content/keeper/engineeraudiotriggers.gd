@@ -33,9 +33,6 @@ func _process(delta):
 	_process_carriable()
 	_process_sounds()
 
-func stopMusic():
-	Audio.stopMusic(0.0, 3.0)
-
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
 	# Unless the loot become ambient, but then should probably be moved
