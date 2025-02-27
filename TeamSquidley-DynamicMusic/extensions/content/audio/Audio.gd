@@ -4,19 +4,20 @@ const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.g
 
 
 var additionalMineAmbience: AudioStreamPlayer
-var player_battleMusicStartingSound: AudioStreamPlayer # based on wave number ?
 
-var player_battleMusicDefault: AudioStreamPlayer
+var player_battle_default: AudioStreamPlayer
 var player_battleMusicMonstersWeight: AudioStreamPlayer # monster amount
 var player_battleMusicMonstersWeight2: AudioStreamPlayer # monster amount
 
-# amount of life + cobalt * heal < threshold -> plays music ?
-var player_battleMusicTotalHp: AudioStreamPlayer # % of life AND considering cobalt
-var player_battleMusicStrongestEnemy: AudioStreamPlayer # strongest enemy
+var player_battle_mid_intensity: AudioStreamPlayer # monster amount v2
+var player_battle_high_intensity: AudioStreamPlayer # monster amount v2
 
 var player_heartbeat: AudioStreamPlayer # critical situation
 var player_preroundhorn: AudioStreamPlayer # beofre round starts sound
 var player_preroundmusic: AudioStreamPlayer # beofre round starts loop
+
+var player_heavy_skymonster: AudioStreamPlayer
+var player_heavy_groundmonster: AudioStreamPlayer
 
 # intensity based on wave number ? monsters amount ? damage taken ? strongest enemy ?
 # outside dome variations? -> perhaps deafen monsters ?
@@ -59,8 +60,8 @@ const gravelsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble7.ogg"),
 ]
 # Arbitrary numbers
-const WEIGHT_CAP1 := 5
-const WEIGHT_CAP2 := 8
+const WEIGHT_CAP1 := 6
+const WEIGHT_CAP2 := 9
 const HP_CAP := 400
 
 var allBattleMusicsPlayers: Array[AudioStreamPlayer]
@@ -94,24 +95,26 @@ func _ready():
 	player_preroundmusic = generatePlayer(&"Music", 0, false)
 	player_preroundmusic.volume_db = -60
 	player_preroundmusic.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg")
-	player_battleMusicStartingSound = generateMusicPlayer()
-	player_battleMusicDefault = generateMusicPlayer()
-	player_battleMusicDefault.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 1.mp3")
-	player_battleMusicMonstersWeight = generateMusicPlayer()
-	player_battleMusicMonstersWeight.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 2.mp3")
-	player_battleMusicMonstersWeight2 = generateMusicPlayer()
-	player_battleMusicTotalHp = generateMusicPlayer()
-	player_battleMusicTotalHp.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 3.mp3")
-	player_battleMusicStrongestEnemy = generateMusicPlayer()
-	#battleMusicStrongestEnemy.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 3.mp3")
+	
+	player_battle_default = generateMusicPlayer()
+	player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/base_layer_no_res.mp3")
+	
+	player_battle_mid_intensity = generateMusicPlayer()
+	player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/medium_intensity_no_res.mp3")
+	player_battle_high_intensity = generateMusicPlayer()
+	player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/high_intensity_no_res.mp3")
+	
+	player_heavy_groundmonster = generateMusicPlayer()
+	player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/ground_boss_no_res.mp3")
+	player_heavy_skymonster = generateMusicPlayer()
+	player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/sky_boss_no_res.mp3")
 	
 	allBattleMusicsPlayers = [
-		player_battleMusicStartingSound,
-		player_battleMusicDefault,
-		player_battleMusicMonstersWeight,
-		player_battleMusicMonstersWeight2,
-		player_battleMusicTotalHp,
-		player_battleMusicStrongestEnemy
+		player_battle_default,
+		player_battle_mid_intensity,
+		player_battle_high_intensity,
+		player_heavy_groundmonster,
+		player_heavy_skymonster
 	]
 
 	player_droplet = generateCaveEffectPlayer()
@@ -131,7 +134,7 @@ func playDiscovery():
 func preBattleMusic(time_left: float):
 	stopMusic(0.0, 1.0)
 	player_preroundhorn.play()
-	player_preroundmusic.volume_db = -30
+	player_preroundmusic.volume_db = -18
 	player_preroundmusic.play()
 	fade_in_music(player_preroundmusic, 1.5, time_left - 2)
 	fade_out_music(player_preroundmusic, time_left - 0.5, 1)
@@ -139,6 +142,7 @@ func preBattleMusic(time_left: float):
 
 func checkPreBattleMusic():
 	return prebattle
+
 func gameOver():
 	removeMuffle()
 
@@ -201,18 +205,22 @@ func playMusicTrack(track, delay:=0.0):
 func startBattleMusic():
 	super.startBattleMusic()
 	# they all should start playing, even if they are muted
-	player_battleMusicDefault.volume_db = 0 # by default on
+	player_battle_default.volume_db = -60 # by default on
 
 	# initialize music layers with default values
 	set_music_based_on_monster_amount(0, false)
-	set_music_based_on_strongest_monster(false)
-	set_music_based_on_hp(CONSTMOD.getTotalHp(), false)
+	#set_music_based_on_strongest_monster(false)
+	set_music_based_on_hp()
 	
 	weight1 = false
 	weight2 = false
-	heavy_monster_activated = false
+	ground_heavy_monster_activated = false
+	sky_heavy_monster_activated = false
 	prebattle = false
+	cap1 = false
+	cap2 = false
 	
+	fade_in_music(player_battle_default)
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		player.play(0.0)
 
@@ -262,26 +270,49 @@ func set_music_based_on_monster_amount(monsters_amount: int, monster_killed: boo
 			fade_out_music(player_battleMusicMonstersWeight)
 	_check_heartbeat()
 
+var cap1 = false
+var cap2 = false
+func set_music_based_on_monster_amount_2(monsters_amount: int):
+	_check_heartbeat()
+	monstersAmount = monsters_amount
+	if not cap1 and not cap2:
+		if monstersAmount >= WEIGHT_CAP1:
+			cap1 = true
+			fade_out_music(player_battle_default)
+			fade_in_music(player_battle_mid_intensity)
+		if monstersAmount >= WEIGHT_CAP2:
+			cap2 = true
+			fade_out_music(player_battle_mid_intensity)
+			fade_in_music(player_battle_high_intensity)
+			return
+	if cap1 and cap2:
+		if monstersAmount < WEIGHT_CAP2:
+			cap2 = false
+			fade_out_music(player_battle_mid_intensity)
+			fade_in_music(player_battle_high_intensity)
+	if cap1 and not cap2:
+		if monstersAmount < WEIGHT_CAP1:
+			cap1 = false
+			fade_out_music(player_battle_mid_intensity)
+			fade_in_music(player_battle_default)
+		elif monstersAmount >= WEIGHT_CAP2:
+			cap2 = true
+			fade_out_music(player_battle_mid_intensity)
+			fade_in_music(player_battle_high_intensity)
 
 # Should be called on heavy monster spawn
-var heavy_monster_activated = false
-func set_music_based_on_strongest_monster(activate: bool):
-	if activate and not heavy_monster_activated:
-		fade_in_music(player_battleMusicStrongestEnemy)
-		heavy_monster_activated = true
-	if not activate and heavy_monster_activated:
-		fade_out_music(player_battleMusicStrongestEnemy)
-		heavy_monster_activated = false
+var ground_heavy_monster_activated = false
+var sky_heavy_monster_activated = false
+func set_music_based_on_strongest_monster(is_flying: bool):
+	if is_flying and not sky_heavy_monster_activated:
+		fade_in_music(player_heavy_skymonster)
+		sky_heavy_monster_activated = true
+	if not is_flying and not ground_heavy_monster_activated:
+		fade_in_music(player_heavy_groundmonster)
+		ground_heavy_monster_activated = true
 
 # Should be called on any hp changes
-func set_music_based_on_hp(hp: int, hp_loss: bool):
-	if hp_loss and hp < HP_CAP and not has_hp_faded_in:
-		fade_in_music(player_battleMusicTotalHp)
-		has_hp_faded_in = true
-	else:
-		player_battleMusicTotalHp.volume_db = 0 if hp < HP_CAP else -60
-	if hp >= HP_CAP:
-		has_hp_faded_in = false
+func set_music_based_on_hp():
 	_check_heartbeat()
 
 var isHeartbeatPlaying = false
