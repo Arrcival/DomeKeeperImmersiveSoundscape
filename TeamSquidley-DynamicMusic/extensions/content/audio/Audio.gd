@@ -31,6 +31,8 @@ var cave_effects_reverb: AudioEffectReverb
 
 var heartbeat_lowpass : AudioEffectLowPassFilter
 
+var master_pitch_effect : AudioEffectPitchShift
+
 var player_discovery: AudioStreamPlayer
 
 var monstersAmount: int = 0
@@ -141,6 +143,10 @@ func _ready():
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("Monster"), heartbeat_lowpass)
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("Music"), heartbeat_lowpass)
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("Sounds"), heartbeat_lowpass)
+	
+	master_pitch_effect = AudioEffectPitchShift.new()
+	master_pitch_effect.pitch_scale = 1.0
+	AudioServer.add_bus_effect(AudioServer.get_bus_index("Master"), master_pitch_effect)
 	#endregion
 
 	#region Creating and registering audio players
@@ -471,6 +477,11 @@ func fade_in_music_bus(fade :float = 1.0):
 	tween.tween_property($Music, "volume_db", 0, fade)
 	tween.tween_property(self, "isFadingIn", false, 0.0).set_delay(fade)
 #endregion
+
+func mushroomIncreasePitch(duration: float):
+	master_pitch_effect.pitch_scale = 1.25
+	var tween = create_tween()
+	tween.tween_property(master_pitch_effect, "pitch_scale", 1.0, 1).set_delay(duration)
 
 func sound(soundName:String):
 	#skipping replaced sounds by music/new sounds

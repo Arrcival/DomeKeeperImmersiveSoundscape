@@ -16,6 +16,7 @@ func _init(modLoader = ModLoader):
 	# Add extensions
 	loadExtension(ext_dir, "content/audio/Audio.gd")
 	loadExtension(ext_dir, "game/GameWorld.gd")
+	loadExtension(ext_dir, "content/caves/mushroomcave/MushroomCave.gd")
 	loadExtension(ext_dir, "content/hud/wavemeter/WaveMeter.gd")
 	loadExtension(ext_dir, "content/keeper/engineeraudiotriggers.gd")
 	loadExtension(ext_dir, "content/keeper/assessoraudiotriggers.gd")
