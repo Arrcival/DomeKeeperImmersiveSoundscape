@@ -32,7 +32,13 @@ var player_discovery: AudioStreamPlayer
 
 var monstersAmount: int = 0
 
+const prebattle1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop1_V2.mp3")
+const prebattle2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop2_V2.mp3")
+const prebattle3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop3_V2.mp3")
+const prebattle4 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop4_V2.mp3")
+var prebattleloop
 const abstractTrack = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/abstractsounds.wav")
+
 const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2.ogg"),
@@ -49,6 +55,26 @@ const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water13.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water14.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water15.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5_Right2.mp3"),
 ]
 const gravelsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1.ogg"),
@@ -58,6 +84,27 @@ const gravelsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble6.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble7.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Right2.mp3"),
+
 ]
 # Arbitrary numbers
 const WEIGHT_CAP1 := 6
@@ -71,7 +118,7 @@ const BUS_CAVE_EFFECTS_ID := 1
 
 var has_hp_faded_in: bool = false
 var prebattle = false
-
+var wavenum = 1
 func _ready():
 	super._ready()
 
@@ -124,6 +171,7 @@ func _ready():
 	player_abstract = generateCaveEffectPlayer()
 	player_abstract.volume_db = -5
 	player_discovery = generatePlayer(&"Sounds", 0, false)
+	player_discovery.volume_db = -5
 	player_discovery.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/discovering.mp3")
 	#endregion
 
@@ -132,8 +180,21 @@ func playDiscovery():
 		player_discovery.play()
 
 func preBattleMusic(time_left: float):
+	if wavenum >=1 and wavenum < 5:
+		prebattleloop = prebattle1
+		print("1")
+	elif wavenum >= 5 and wavenum <9:
+		prebattleloop = prebattle2
+		print("2")
+	elif wavenum >= 9 and wavenum < 13:
+		prebattleloop = prebattle3
+		print("3")
+	elif wavenum >= 13:
+		prebattleloop = prebattle4
+		print("4")
 	stopMusic(0.0, 1.0)
 	player_preroundhorn.play()
+	player_preroundmusic.stream = prebattleloop
 	player_preroundmusic.volume_db = -18
 	player_preroundmusic.play()
 	fade_in_music(player_preroundmusic, 1.5, time_left - 2)
@@ -226,6 +287,7 @@ func startBattleMusic():
 
 func stopBattleMusic():
 	super.stopBattleMusic()
+	wavenum += 1
 	# stop every music, but should fade off to be less abrupt
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		fade_out_music(player)
