@@ -28,6 +28,8 @@ var player_gravel: AudioStreamPlayer
 var player_abstract: AudioStreamPlayer
 var cave_effects_reverb: AudioEffectReverb
 
+var heartbeat_lowpass : AudioEffectLowPassFilter
+
 var player_discovery: AudioStreamPlayer
 
 var monstersAmount: int = 0
@@ -114,7 +116,6 @@ const HP_CAP := 400
 var allBattleMusicsPlayers: Array[AudioStreamPlayer]
 
 const BUS_CAVE_EFFECTS_NAME := "CaveEffects"
-const BUS_CAVE_EFFECTS_ID := 1
 
 var has_hp_faded_in: bool = false
 var prebattle = false
@@ -123,11 +124,18 @@ func _ready():
 	super._ready()
 
 	#region Bus creation
-	AudioServer.add_bus(BUS_CAVE_EFFECTS_ID)
-	AudioServer.set_bus_name(BUS_CAVE_EFFECTS_ID, BUS_CAVE_EFFECTS_NAME)
-	AudioServer.set_bus_volume_db(BUS_CAVE_EFFECTS_ID, 0.0)
+	var cave_effect_bus_id = AudioServer.bus_count
+	AudioServer.add_bus(AudioServer.bus_count)
+	AudioServer.set_bus_name(cave_effect_bus_id, BUS_CAVE_EFFECTS_NAME)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(BUS_CAVE_EFFECTS_NAME), 0.0)
 	cave_effects_reverb = AudioEffectReverb.new()
-	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, cave_effects_reverb)
+	AudioServer.add_bus_effect(cave_effect_bus_id, cave_effects_reverb)
+	
+	heartbeat_lowpass = AudioEffectLowPassFilter.new()
+	heartbeat_lowpass.cutoff_hz = 20000
+	AudioServer.add_bus_effect(AudioServer.get_bus_index("Monster"), heartbeat_lowpass)
+	AudioServer.add_bus_effect(AudioServer.get_bus_index("Music"), heartbeat_lowpass)
+	AudioServer.add_bus_effect(AudioServer.get_bus_index("Sounds"), heartbeat_lowpass)
 	#endregion
 
 	#region Creating and registering audio players
@@ -208,27 +216,19 @@ func muffleAudio():
 	if audioMuffled:
 		return
 	audioMuffled = true
-	var lowpass: AudioEffectLowPassFilter = removeLowPassEffectOrNull(AudioServer.get_bus_index("Master"))
-	if lowpass == null:
-		lowpass = AudioEffectLowPassFilter.new()
-	lowpass.cutoff_hz = 2000
+	heartbeat_lowpass.cutoff_hz = 2000
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"),-10)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"),-10)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"),-10)
-	AudioServer.add_bus_effect(AudioServer.get_bus_index("Monster"),lowpass)
-	AudioServer.add_bus_effect(AudioServer.get_bus_index("Music"),lowpass)
-	AudioServer.add_bus_effect(AudioServer.get_bus_index("Sounds"),lowpass)
 
 func removeMuffle():
 	if not audioMuffled:
 		return
 	audioMuffled = false
-	removeLowPassEffectOrNull(AudioServer.get_bus_index("Master"))
-	removeLowPassEffectOrNull(AudioServer.get_bus_index("Sounds"))
-	removeLowPassEffectOrNull(AudioServer.get_bus_index("Monster"))
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"),0)
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"),0)
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"),0)
+	heartbeat_lowpass.cutoff_hz = 20000
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"), 0)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), 0)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"), 0)
 
 func generateMusicPlayer() -> AudioStreamPlayer:
 	return generatePlayer(&"Music", -60, false)
@@ -375,21 +375,18 @@ func set_music_based_on_hp():
 
 var isHeartbeatPlaying = false
 func _check_heartbeat() -> void:
-	if monstersAmount >= WEIGHT_CAP2 and CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying:
-		player_heartbeat.volume_db = 0
+	if CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying:
+		player_heartbeat.volume_db = -60
 		player_heartbeat.play()
 		fade_in_music(player_heartbeat, 0.0, 1.0)
 		isHeartbeatPlaying = true
 		muffleAudio()
-	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500 or CONSTMOD.getTotalHp() <= 0:
+	elif CONSTMOD.getTotalHp() > 500 or CONSTMOD.getTotalHp() <= 0:
 		if isHeartbeatPlaying:
 			isHeartbeatPlaying = false
 			fade_out_music(player_heartbeat, 0.0, 1.0)
 			stop_music(player_heartbeat, 1.0)
 			removeMuffle()
-
-	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500:
-		removeMuffle()
 
 var isDropletPlaying = false
 func play_droplet_sound(room_scale: float):
