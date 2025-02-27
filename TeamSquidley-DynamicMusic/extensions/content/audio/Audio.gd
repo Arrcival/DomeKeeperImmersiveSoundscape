@@ -309,6 +309,7 @@ func stopBattleMusic():
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		fade_out_music(player, 0.0, 4.0)
 		stop_music(player)
+	stop_music(player_final_wave)
 #endregion
 
 #region Ambience
