@@ -34,10 +34,10 @@ var player_discovery: AudioStreamPlayer
 
 var monstersAmount: int = 0
 
-const prebattle1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop1_V2.mp3")
-const prebattle2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop2_V2.mp3")
-const prebattle3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop3_V2.mp3")
-const prebattle4 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop4_V2.mp3")
+const prebattle1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop1_V2.ogg")
+const prebattle2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop2_V2.ogg")
+const prebattle3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop3_V2.ogg")
+const prebattle4 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop4_V2.ogg")
 var prebattleloop
 const abstractTrack = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/abstractsounds.wav")
 
@@ -285,6 +285,7 @@ func startBattleMusic():
 	prebattle = false
 	cap1 = false
 	cap2 = false
+	
 	
 	fade_in_music(player_battle_default)
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
