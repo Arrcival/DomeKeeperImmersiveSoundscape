@@ -28,33 +28,10 @@ func _process(delta):
 	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
 
-	# Fade music anyway before-brebattle music
-	if time <= 16 && time > 15:
-		Audio.fade_out_music_bus()
-	if time <= 15 and time > 14.5 and Data.of("wavemeter.showcounter"):
-		Audio.playHorn()
-	if time <= 14 and time > 1:
-		_process_approching_music()
-	elif time < 1:
-		current_song = MUSIC_TYPE.NONE
-		Audio.fade_out_music_bus()
-
+	# right now they can play even during prewave music
 	_process_carriable()
 	_process_droplets()
 	_process_abstract()
-
-func _process_approching_music():
-	# Current song is currently correct !
-	if current_song == MUSIC_TYPE.MONSTERS_APPROACHING:
-		return
-	# Do not own bar -> no music
-	if not Data.of("wavemeter.showcounter"):
-		return
-	var keeperDist = global_position.length()
-	# The further you are, the quieter the music
-	volume = -(keeperDist / 50)
-	current_song = MUSIC_TYPE.MONSTERS_APPROACHING
-	Audio.preRoundIntroLoop()
 
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters

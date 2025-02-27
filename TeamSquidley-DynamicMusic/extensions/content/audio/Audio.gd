@@ -14,8 +14,8 @@ var player_battleMusicTotalHp: AudioStreamPlayer # % of life AND considering cob
 var player_battleMusicStrongestEnemy: AudioStreamPlayer # strongest enemy
 
 var player_heartbeat: AudioStreamPlayer # critical situation
-var player_preroundintrosound: AudioStreamPlayer # beofre round starts sound
-var player_preroundintrosoundloop: AudioStreamPlayer # beofre round starts loop
+var player_preroundhorn: AudioStreamPlayer # beofre round starts sound
+var player_preroundmusic: AudioStreamPlayer # beofre round starts loop
 
 # intensity based on wave number ? monsters amount ? damage taken ? strongest enemy ?
 # outside dome variations? -> perhaps deafen monsters ?
@@ -50,7 +50,6 @@ const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble6.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble7.ogg"),
-
 ]
 # Arbitrary numbers
 const WEIGHT_CAP1 := 5
@@ -81,12 +80,12 @@ func _ready():
 	player_heartbeat = generatePlayer(&"UI", 0, false)
 	player_heartbeat.volume_db = 15
 	player_heartbeat.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/heartbeat.ogg")
-	player_preroundintrosound = generatePlayer(&"Sounds", 0, false)
-	player_preroundintrosound.volume_db = 0
-	player_preroundintrosound.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(intro).ogg")
-	player_preroundintrosoundloop = generatePlayer(&"Music", 0, false)
-	player_preroundintrosoundloop.volume_db = -10
-	player_preroundintrosoundloop.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg")
+	player_preroundhorn = generatePlayer(&"Sounds", 0, false)
+	player_preroundhorn.volume_db = 0
+	player_preroundhorn.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(intro).ogg")
+	player_preroundmusic = generatePlayer(&"Music", 0, false)
+	player_preroundmusic.volume_db = -60
+	player_preroundmusic.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg")
 	player_battleMusicStartingSound = generateMusicPlayer()
 	player_battleMusicDefault = generateMusicPlayer()
 	player_battleMusicDefault.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 1.mp3")
@@ -97,15 +96,6 @@ func _ready():
 	player_battleMusicTotalHp.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 3.mp3")
 	player_battleMusicStrongestEnemy = generateMusicPlayer()
 	#battleMusicStrongestEnemy.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/content/music/Layer 3.mp3")
-	add_child(player_battleMusicStartingSound)
-	add_child(player_battleMusicDefault)
-	add_child(player_battleMusicMonstersWeight)
-	add_child(player_battleMusicMonstersWeight2)
-	add_child(player_battleMusicTotalHp)
-	add_child(player_battleMusicStrongestEnemy)
-	add_child(player_heartbeat)
-	add_child(player_preroundintrosound)
-	add_child(player_preroundintrosoundloop)
 	
 	allBattleMusicsPlayers = [
 		player_battleMusicStartingSound,
@@ -115,11 +105,11 @@ func _ready():
 		player_battleMusicTotalHp,
 		player_battleMusicStrongestEnemy
 	]
-	
+
 	player_droplet = generateCaveEffectPlayer()
 	player_droplet.volume_db = -5
 	add_child(player_droplet)
-	player_discovery = generatePlayer(&"Sounds",0,false)
+	player_discovery = generatePlayer(&"Sounds", 0, false)
 	player_discovery.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/discovering.mp3")
 	add_child(player_discovery)
 	#endregion
@@ -128,23 +118,13 @@ func playDiscovery():
 	if not player_discovery.playing:
 		player_discovery.play()
 
-#region Pre round
-var hasHornPlayed = false
-func playHorn():
-	if hasHornPlayed:
-		return
-	hasHornPlayed = true
-	player_preroundintrosound.play()
-
-func preRoundIntroLoop(play:bool):
-	if play:
-		player_preroundintrosoundloop.play()
-	else:
-		fade_out_music(player_preroundintrosoundloop,0,1)
-
-func setPreRoundMusicVolume(volume):
-	player_preroundintrosoundloop.volume_db += volume
-#endregion
+func preBattleMusic(time_left: float):
+	stopMusic(0.0, 1.0)
+	player_preroundhorn.play()
+	player_preroundmusic.volume_db = -30
+	player_preroundmusic.play()
+	fade_in_music(player_preroundmusic, 1.5, time_left - 2)
+	fade_out_music(player_preroundmusic, time_left - 0.5, 1)
 
 func gameOver():
 	removeMuffle()
@@ -189,6 +169,7 @@ func generatePlayer(bus_name: String, initial_volume: float, is_playing: bool = 
 	player.volume_db = initial_volume
 	if not is_playing:
 		player.stop()
+	add_child(player)
 	return player
 
 func playMusicTrack(track, delay:=0.0):
@@ -214,7 +195,6 @@ func startBattleMusic():
 	set_music_based_on_strongest_monster(false)
 	set_music_based_on_hp(CONSTMOD.getTotalHp(), false)
 	
-	hasHornPlayed = false
 	weight1 = false
 	weight2 = false
 	heavy_monster_activated = false
@@ -337,7 +317,9 @@ func play_abstract_sound(room_scale: float):
 	player_droplet.play(randf_range(0,145))
 	fade_in_music(player_droplet,0,1)
 	fade_out_music(player_droplet,5,2)
+#endregion
 
+#region Effects
 func removeReverbEffectOrNull(bus_id: int) -> AudioEffectReverb:
 	for i in range(AudioServer.get_bus_effect_count(bus_id)):
 		var effect = AudioServer.get_bus_effect(bus_id, i)
@@ -352,6 +334,7 @@ func removeLowPassEffectOrNull(bus_id: int) -> AudioEffectLowPassFilter:
 		if effect is AudioEffectLowPassFilter:
 			AudioServer.remove_bus_effect(bus_id,i)
 	return null
+#endregion
 
 #region Start & Stops
 # those method doesn't stop the players so they are still in sync
