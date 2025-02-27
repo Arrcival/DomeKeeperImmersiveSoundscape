@@ -117,9 +117,12 @@ var allBattleMusicsPlayers: Array[AudioStreamPlayer]
 
 const BUS_CAVE_EFFECTS_NAME := "CaveEffects"
 
+const USE_RESONANCE = true
+
 var has_hp_faded_in: bool = false
 var prebattle = false
 var wavenum = 1
+
 func _ready():
 	super._ready()
 
@@ -152,17 +155,26 @@ func _ready():
 	player_preroundmusic.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg")
 	
 	player_battle_default = generateMusicPlayer()
-	player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/base_layer_no_res.mp3")
 	
 	player_battle_mid_intensity = generateMusicPlayer()
-	player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/medium_intensity_no_res.mp3")
 	player_battle_high_intensity = generateMusicPlayer()
-	player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/high_intensity_no_res.mp3")
 	
 	player_heavy_groundmonster = generateMusicPlayer()
-	player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/ground_boss_no_res.mp3")
 	player_heavy_skymonster = generateMusicPlayer()
-	player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/sky_boss_no_res.mp3")
+	
+	if USE_RESONANCE:
+		player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/base_layer_res.mp3")
+		player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/medium_intensity_res.mp3")
+		player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/high_intensity_res.mp3")
+		player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/ground_boss_res.mp3")
+		player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/sky_boss_res.mp3")
+	else:
+		player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/base_layer_no_res.mp3")
+		player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/medium_intensity_no_res.mp3")
+		player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/high_intensity_no_res.mp3")
+		player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/ground_boss_no_res.mp3")
+		player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/sky_boss_no_res.mp3")
+	
 	
 	allBattleMusicsPlayers = [
 		player_battle_default,
@@ -265,12 +277,9 @@ func startBattleMusic():
 	player_battle_default.volume_db = -60 # by default on
 
 	# initialize music layers with default values
-	set_music_based_on_monster_amount(0, false)
-	#set_music_based_on_strongest_monster(false)
+	set_music_based_on_monster_amount(0)
 	set_music_based_on_hp()
 	
-	weight1 = false
-	weight2 = false
 	ground_heavy_monster_activated = false
 	sky_heavy_monster_activated = false
 	prebattle = false
@@ -286,7 +295,7 @@ func stopBattleMusic():
 	wavenum += 1
 	# stop every music, but should fade off to be less abrupt
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
-		fade_out_music(player)
+		fade_out_music(player, 0.0, 4.0)
 		stop_music(player)
 #endregion
 
@@ -302,60 +311,34 @@ func stopAmbienceMine():
 
 #region Events
 # Should be called on monster spawn AND kill
-var weight1 = false
-var weight2 = false
-func set_music_based_on_monster_amount(monsters_amount: int, monster_killed: bool):
-	monstersAmount = monsters_amount
-	if monster_killed:
-		if monsters_amount < WEIGHT_CAP2:
-			weight2 = false
-			fade_out_music(player_battleMusicMonstersWeight2)
-		elif monsters_amount < WEIGHT_CAP1:
-			weight1 = false
-			fade_out_music(player_battleMusicMonstersWeight)
-	else:
-		if monsters_amount >= WEIGHT_CAP2 and not weight2:
-			weight2 = true
-			fade_in_music(player_battleMusicMonstersWeight2)
-		elif monsters_amount < WEIGHT_CAP2 and weight2:
-			weight2 = false
-			fade_out_music(player_battleMusicMonstersWeight2)
-		if monsters_amount >= WEIGHT_CAP1 and not weight1:
-			weight1 = true
-			fade_in_music(player_battleMusicMonstersWeight)
-		elif monsters_amount < WEIGHT_CAP1 and weight1:
-			weight1 = false
-			fade_out_music(player_battleMusicMonstersWeight)
-	_check_heartbeat()
-
 var cap1 = false
 var cap2 = false
-func set_music_based_on_monster_amount_2(monsters_amount: int):
+func set_music_based_on_monster_amount(monsters_amount: int):
 	_check_heartbeat()
 	monstersAmount = monsters_amount
 	if not cap1 and not cap2:
 		if monstersAmount >= WEIGHT_CAP1:
 			cap1 = true
-			fade_out_music(player_battle_default)
+			fade_out_music(player_battle_default, 1.0, 3.0)
 			fade_in_music(player_battle_mid_intensity)
 		if monstersAmount >= WEIGHT_CAP2:
 			cap2 = true
-			fade_out_music(player_battle_mid_intensity)
+			fade_out_music(player_battle_mid_intensity, 1.0, 3.0)
 			fade_in_music(player_battle_high_intensity)
 			return
 	if cap1 and cap2:
 		if monstersAmount < WEIGHT_CAP2:
 			cap2 = false
-			fade_out_music(player_battle_mid_intensity)
+			fade_out_music(player_battle_mid_intensity, 1.0, 3.0)
 			fade_in_music(player_battle_high_intensity)
 	if cap1 and not cap2:
 		if monstersAmount < WEIGHT_CAP1:
 			cap1 = false
-			fade_out_music(player_battle_mid_intensity)
+			fade_out_music(player_battle_mid_intensity, 1.0, 3.0)
 			fade_in_music(player_battle_default)
 		elif monstersAmount >= WEIGHT_CAP2:
 			cap2 = true
-			fade_out_music(player_battle_mid_intensity)
+			fade_out_music(player_battle_mid_intensity, 1.0, 3.0)
 			fade_in_music(player_battle_high_intensity)
 
 # Should be called on heavy monster spawn
@@ -426,15 +409,6 @@ func play_abstract_sound(room_scale: float):
 	fade_out_music(player_abstract, 5, 2)
 	create_tween().tween_property(self, "isAbstractPlaying", false, 0.0).set_delay(player_abstract.stream.get_length() * 2)
 
-#endregion
-
-#region Effects
-func removeLowPassEffectOrNull(bus_id: int) -> AudioEffectLowPassFilter:
-	for i in range(AudioServer.get_bus_effect_count(bus_id)):
-		var effect = AudioServer.get_bus_effect(bus_id, i)
-		if effect is AudioEffectLowPassFilter:
-			AudioServer.remove_bus_effect(bus_id,i)
-	return null
 #endregion
 
 #region Start & Stops

@@ -23,8 +23,7 @@ func _spawnMonster(chain: ModLoaderHookChain, breed:String, variant:String, grou
 	if heavyGroundMonster.has(breed):
 		Audio.set_music_based_on_strongest_monster(false)
 	
-	#Audio.set_music_based_on_monster_amount(enemiesWeight, false)
-	Audio.set_music_based_on_monster_amount_2(enemiesWeight)
+	Audio.set_music_based_on_monster_amount(enemiesWeight)
 
 func monsterDied(chain: ModLoaderHookChain, m):
 	chain.execute_next([m])
@@ -33,5 +32,4 @@ func monsterDied(chain: ModLoaderHookChain, m):
 		enemiesWeight -= 0.05
 	else:
 		enemiesWeight -= 1
-	#Audio.set_music_based_on_monster_amount(enemiesWeight, true)
-	Audio.set_music_based_on_monster_amount_2(enemiesWeight)
+	Audio.set_music_based_on_monster_amount(enemiesWeight)
