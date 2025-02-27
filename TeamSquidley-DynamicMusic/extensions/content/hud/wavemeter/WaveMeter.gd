@@ -5,6 +5,10 @@ var hasPlayedHorn = false
 func propertyChanged(property:String, oldValue, newValue):
 	super.propertyChanged(property, oldValue, newValue)
 	
+	# called on wave starts and end 
+	if property == "monsters.wavepresent":
+		hasPlayedHorn = false
+	
 	if hasPlayedHorn:
 		return
 	

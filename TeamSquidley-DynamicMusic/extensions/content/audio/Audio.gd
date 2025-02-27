@@ -137,7 +137,7 @@ func preBattleMusic(time_left: float):
 	player_preroundmusic.volume_db = -18
 	player_preroundmusic.play()
 	fade_in_music(player_preroundmusic, 1.5, time_left - 2)
-	fade_out_music(player_preroundmusic, time_left - 0.5, 1)
+	fade_out_music(player_preroundmusic, time_left, 1)
 	prebattle = true
 
 func checkPreBattleMusic():
