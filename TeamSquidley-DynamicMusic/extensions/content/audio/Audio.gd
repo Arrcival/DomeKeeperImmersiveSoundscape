@@ -488,6 +488,6 @@ func fade_in_music_bus(fade :float = 1.0):
 func sound(soundName:String):
 	print(soundName)
 	#skipping replaced sounds by music/new sounds
-	if soundName == "wavestart" or soundName == "alarm":
+	if soundName == "wavestart":
 		return
 	super.sound(soundName)
