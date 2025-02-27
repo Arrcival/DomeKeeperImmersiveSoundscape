@@ -9,7 +9,6 @@ var time = 0
 var timewithoutmusic = 0
 var volume = 0
 var transitionsongtime = 0
-const prewave = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg")
 const layer1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-1.ogg")
 const layer2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-2.ogg")
 const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-3.ogg")
@@ -32,7 +31,6 @@ func _process(delta):
 	_process_droplets()
 	_process_abstract()
 
-
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
 	# Unless the loot become ambient, but then should probably be moved
@@ -52,10 +50,12 @@ func _process_carriable() -> void:
 					return
 				carriedvalue += getMaterialValue(item.type)
 		# if a song is playing, do not interrupt
-		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song != MUSIC_TYPE.GOOD_LOOT:
+		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song not in [MUSIC_TYPE.GOOD_LOOT, MUSIC_TYPE.MONSTERS_APPROACHING] and not Audio.checkPreBattleMusic():
 			current_song = MUSIC_TYPE.GOOD_LOOT
 			#play the song
 			Audio.startMusic(1, 3.0)
+		elif Audio.checkPreBattleMusic():
+			Audio.stopMusic(0.0, 3.0)
 		elif carriedvalue < 9 and current_song == MUSIC_TYPE.GOOD_LOOT:
 			carriedvalue = 0
 			Audio.stopMusic(0.0, 3.0)
@@ -83,7 +83,6 @@ func _process_abstract() -> void:
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
 			Audio.play_abstract_sound(room_scale * 2)
-
 func getMaterialValue(material:String):
 	match material:
 		CONST.POWERCORE:

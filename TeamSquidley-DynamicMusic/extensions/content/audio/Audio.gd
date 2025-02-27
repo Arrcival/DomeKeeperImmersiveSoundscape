@@ -2,6 +2,7 @@ extends "res://systems/audio/Audio.gd"
 
 const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd")
 
+
 var additionalMineAmbience: AudioStreamPlayer
 var player_battleMusicStartingSound: AudioStreamPlayer # based on wave number ?
 
@@ -62,11 +63,12 @@ const BUS_CAVE_EFFECTS_NAME := "CaveEffects"
 const BUS_CAVE_EFFECTS_ID := 1
 
 var has_hp_faded_in: bool = false
+var prebattle = false
 
 func _ready():
 	super._ready()
 
-	#region Buscreation
+	#region Bus creation
 	AudioServer.add_bus(BUS_CAVE_EFFECTS_ID)
 	AudioServer.set_bus_name(BUS_CAVE_EFFECTS_ID, BUS_CAVE_EFFECTS_NAME)
 	AudioServer.set_bus_volume_db(BUS_CAVE_EFFECTS_ID, 0.0)
@@ -125,7 +127,10 @@ func preBattleMusic(time_left: float):
 	player_preroundmusic.play()
 	fade_in_music(player_preroundmusic, 1.5, time_left - 2)
 	fade_out_music(player_preroundmusic, time_left - 0.5, 1)
+	prebattle = true
 
+func checkPreBattleMusic():
+	return prebattle
 func gameOver():
 	removeMuffle()
 
@@ -198,6 +203,7 @@ func startBattleMusic():
 	weight1 = false
 	weight2 = false
 	heavy_monster_activated = false
+	prebattle = false
 	
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		player.play(0.0)
