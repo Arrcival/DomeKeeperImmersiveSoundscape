@@ -18,6 +18,7 @@ var player_preroundmusic: AudioStreamPlayer # beofre round starts loop
 
 var player_heavy_skymonster: AudioStreamPlayer
 var player_heavy_groundmonster: AudioStreamPlayer
+var player_final_wave: AudioStreamPlayer
 
 # intensity based on wave number ? monsters amount ? damage taken ? strongest enemy ?
 # outside dome variations? -> perhaps deafen monsters ?
@@ -122,6 +123,7 @@ const USE_RESONANCE = true
 var has_hp_faded_in: bool = false
 var prebattle = false
 var wavenum = 1
+var finalwave = false
 
 func _ready():
 	super._ready()
@@ -161,6 +163,11 @@ func _ready():
 	
 	player_heavy_groundmonster = generateMusicPlayer()
 	player_heavy_skymonster = generateMusicPlayer()
+	player_final_wave = generateMusicPlayer()
+
+	player_final_wave = generatePlayer(&"Music", 0, false)
+	player_final_wave.volume_db = -60
+	player_final_wave.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg") # the epic song goes there 8)
 	
 	if USE_RESONANCE:
 		player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/base_layer_res.mp3")
@@ -221,6 +228,7 @@ func checkPreBattleMusic():
 	return prebattle
 
 func gameOver():
+	finalwave = false
 	removeMuffle()
 
 var audioMuffled = false
@@ -285,8 +293,11 @@ func startBattleMusic():
 	prebattle = false
 	cap1 = false
 	cap2 = false
-	
-	
+
+	if Data.of("inventory.relic") == 1:
+		playFinalWaveMusic()
+		finalwave = true
+		return
 	fade_in_music(player_battle_default)
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		player.play(0.0)
@@ -308,6 +319,9 @@ func playAmbienceMine():
 func stopAmbienceMine():
 	super.stopAmbienceMine()
 	# stop new sounds here
+func playFinalWaveMusic():
+	player_final_wave.play()
+	fade_in_music(player_final_wave, 0.0, 3.0)
 #endregion
 
 #region Events
@@ -315,6 +329,8 @@ func stopAmbienceMine():
 var cap1 = false
 var cap2 = false
 func set_music_based_on_monster_amount(monsters_amount: int):
+	if finalwave == true:
+		return
 	_check_heartbeat()
 	monstersAmount = monsters_amount
 	if not cap1 and not cap2:
@@ -346,6 +362,8 @@ func set_music_based_on_monster_amount(monsters_amount: int):
 var ground_heavy_monster_activated = false
 var sky_heavy_monster_activated = false
 func set_music_based_on_strongest_monster(is_flying: bool):
+	if finalwave == true:
+		return
 	if is_flying and not sky_heavy_monster_activated:
 		fade_in_music(player_heavy_skymonster)
 		sky_heavy_monster_activated = true
