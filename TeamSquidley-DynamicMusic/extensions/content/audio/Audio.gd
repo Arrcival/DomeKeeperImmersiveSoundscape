@@ -421,5 +421,11 @@ func fade_in_music_bus(fade :float = 1.0):
 	var tween = create_tween()
 	tween.tween_property($Music, "volume_db", 0, fade)
 	tween.tween_property(self, "isFadingIn", false, 0.0).set_delay(fade)
-
 #endregion
+
+func sound(soundName:String):
+	print(soundName)
+	#skipping replaced sounds by music/new sounds
+	if soundName == "wavestart" or soundName == "alarm":
+		return
+	super.sound(soundName)
