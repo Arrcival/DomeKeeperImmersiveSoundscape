@@ -37,6 +37,7 @@ func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
 	# Unless the loot become ambient, but then should probably be moved
 	# to an another player
+	#print(Audio.checkPreBattleMusic())
 	if current_song == MUSIC_TYPE.MONSTERS_APPROACHING:
 		return
 	if carriedCarryables.size() >= 1:

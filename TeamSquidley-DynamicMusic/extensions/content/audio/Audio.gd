@@ -182,16 +182,12 @@ func playDiscovery():
 func preBattleMusic(time_left: float):
 	if wavenum >=1 and wavenum < 5:
 		prebattleloop = prebattle1
-		print("1")
 	elif wavenum >= 5 and wavenum <9:
 		prebattleloop = prebattle2
-		print("2")
 	elif wavenum >= 9 and wavenum < 13:
 		prebattleloop = prebattle3
-		print("3")
 	elif wavenum >= 13:
 		prebattleloop = prebattle4
-		print("4")
 	stopMusic(0.0, 1.0)
 	player_preroundhorn.play()
 	player_preroundmusic.stream = prebattleloop
@@ -486,7 +482,6 @@ func fade_in_music_bus(fade :float = 1.0):
 #endregion
 
 func sound(soundName:String):
-	print(soundName)
 	#skipping replaced sounds by music/new sounds
 	if soundName == "wavestart":
 		return
