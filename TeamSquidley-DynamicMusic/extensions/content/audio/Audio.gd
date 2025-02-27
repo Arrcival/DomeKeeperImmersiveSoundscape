@@ -376,7 +376,7 @@ func set_music_based_on_hp():
 var isHeartbeatPlaying = false
 func _check_heartbeat() -> void:
 	if monstersAmount >= WEIGHT_CAP2 and CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying:
-		player_heartbeat.volume_db = -60
+		player_heartbeat.volume_db = 0
 		player_heartbeat.play()
 		fade_in_music(player_heartbeat, 0.0, 1.0)
 		isHeartbeatPlaying = true
