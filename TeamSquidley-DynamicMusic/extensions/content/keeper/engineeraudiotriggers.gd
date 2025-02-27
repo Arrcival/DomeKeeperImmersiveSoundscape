@@ -6,7 +6,6 @@ enum MUSIC_TYPE { NONE = 0, MONSTERS_APPROACHING = 1, GOOD_LOOT = 2 }
 var current_song : MUSIC_TYPE = MUSIC_TYPE.NONE
 var time_between_waves = GameWorld.getTimeBetweenWaves()
 var time = 0
-var lasttime = 0
 var timewithoutmusic = 0
 var volume = 0
 var transitionsongtime = 0
@@ -78,8 +77,9 @@ func _process_droplets() -> void:
 func _process_abstract() -> void:
 	var keeper_distance_to_dome = global_position.length()
 	if keeper_distance_to_dome >= ABSTRACT_THRESHOLD and GameWorld.paused == false:
+		var mult = 1 + (keeper_distance_to_dome - 400)/1000
 		var random = randf()
-		if random < ABSTRACT_CHANCE_PER_FRAME:
+		if random < (ABSTRACT_CHANCE_PER_FRAME*mult):
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
 			Audio.play_abstract_sound(room_scale * 2)

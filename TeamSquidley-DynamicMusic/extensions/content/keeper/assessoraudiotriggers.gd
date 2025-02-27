@@ -23,15 +23,15 @@ const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 const DROPLET_CHANCE_PER_FRAME: float = 0.0005
 const ABSTRACT_CHANCE_PER_FRAME: float = 0.0000025
 
-
 func _process(delta):
-	# TEST: If size is greater or equal than 2 play the song
 	time = Data.of("monsters.wavecooldown")
-
-	# right now they can play even during prewave music
+	# TEST: If size is greater or equal than 2 play the song
+	# Fade music anyway before-brebattle music
+	
 	_process_carriable()
 	_process_droplets()
 	_process_abstract()
+
 
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
@@ -77,8 +77,9 @@ func _process_droplets() -> void:
 func _process_abstract() -> void:
 	var keeper_distance_to_dome = global_position.length()
 	if keeper_distance_to_dome >= ABSTRACT_THRESHOLD and GameWorld.paused == false:
+		var mult = 1 + (keeper_distance_to_dome - 400)/1000
 		var random = randf()
-		if random < ABSTRACT_CHANCE_PER_FRAME:
+		if random < (ABSTRACT_CHANCE_PER_FRAME*mult):
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
 			Audio.play_abstract_sound(room_scale * 2)
