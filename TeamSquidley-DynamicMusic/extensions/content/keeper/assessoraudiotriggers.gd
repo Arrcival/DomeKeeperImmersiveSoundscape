@@ -9,9 +9,6 @@ var time = 0
 var timewithoutmusic = 0
 var volume = 0
 var transitionsongtime = 0
-const layer1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-1.ogg")
-const layer2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-2.ogg")
-const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Tracks/Layer-3.ogg")
 
 var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new()
 
