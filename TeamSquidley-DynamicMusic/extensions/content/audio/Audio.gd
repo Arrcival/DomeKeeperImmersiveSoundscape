@@ -23,6 +23,10 @@ var player_preroundmusic: AudioStreamPlayer # beofre round starts loop
 
 var player_additional_music: AudioStreamPlayer
 var player_droplet: AudioStreamPlayer
+var player_gravel: AudioStreamPlayer
+var player_abstract: AudioStreamPlayer
+var cave_effects_reverb: AudioEffectReverb
+
 var player_discovery: AudioStreamPlayer
 
 var monstersAmount: int = 0
@@ -44,6 +48,8 @@ const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water13.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water14.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water15.ogg"),
+]
+const gravelsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2.ogg"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3.ogg"),
@@ -72,8 +78,8 @@ func _ready():
 	AudioServer.add_bus(BUS_CAVE_EFFECTS_ID)
 	AudioServer.set_bus_name(BUS_CAVE_EFFECTS_ID, BUS_CAVE_EFFECTS_NAME)
 	AudioServer.set_bus_volume_db(BUS_CAVE_EFFECTS_ID, 0.0)
-	var reverb = AudioEffectReverb.new()
-	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, reverb)
+	cave_effects_reverb = AudioEffectReverb.new()
+	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, cave_effects_reverb)
 	#endregion
 
 	#region Creating and registering audio players
@@ -110,10 +116,12 @@ func _ready():
 
 	player_droplet = generateCaveEffectPlayer()
 	player_droplet.volume_db = -5
-	add_child(player_droplet)
+	player_gravel = generateCaveEffectPlayer()
+	player_gravel.volume_db = -5
+	player_abstract = generateCaveEffectPlayer()
+	player_abstract.volume_db = -5
 	player_discovery = generatePlayer(&"Sounds", 0, false)
 	player_discovery.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/discovering.mp3")
-	add_child(player_discovery)
 	#endregion
 
 func playDiscovery():
@@ -293,47 +301,48 @@ func _check_heartbeat() -> void:
 
 	elif monstersAmount < WEIGHT_CAP2 or CONSTMOD.getTotalHp() > 500:
 		removeMuffle()
-		
+
+var isDropletPlaying = false
 func play_droplet_sound(room_scale: float):
-	if player_droplet.playing:
+	if isDropletPlaying:
 		return
-	var reverb: AudioEffectReverb = removeReverbEffectOrNull(BUS_CAVE_EFFECTS_ID)
-	if reverb != null:
-		reverb.room_size = room_scale
-	else:
-		reverb = AudioEffectReverb.new()
+	isDropletPlaying = true
+	cave_effects_reverb.room_size = room_scale
 	player_droplet.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
 	player_droplet.volume_db = -(room_scale * 10) # Placeholder
-	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, reverb)
 	player_droplet.stream = dropletsounds[randi() % dropletsounds.size()]
 	player_droplet.play()
+	
+	create_tween().tween_property(self, "isDropletPlaying", false, 0.0).set_delay(player_droplet.stream.get_length() * 2)
 
-func play_abstract_sound(room_scale: float):
-	if player_droplet.playing:
+var isGravelPlaying = false
+func play_gravel_sound(room_scale: float):
+	if isGravelPlaying:
 		return
-	var reverb: AudioEffectReverb = removeReverbEffectOrNull(BUS_CAVE_EFFECTS_ID)
-	if reverb != null:
-		reverb.room_size = room_scale
-	else:
-		reverb = AudioEffectReverb.new()
-	player_droplet.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
-	player_droplet.volume_db = -(room_scale * 10) # Placeholder
-	AudioServer.add_bus_effect(BUS_CAVE_EFFECTS_ID, reverb)
-	player_droplet.stream = abstractTrack
-	player_droplet.play(randf_range(0,145))
-	fade_in_music(player_droplet,0,1)
-	fade_out_music(player_droplet,5,2)
+	isGravelPlaying = true
+	player_gravel.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
+	player_gravel.volume_db = -(room_scale * 10) # Placeholder
+	player_gravel.stream = gravelsounds[randi() % gravelsounds.size()]
+	player_gravel.play()
+	create_tween().tween_property(self, "isGravelPlaying", false, 0.0).set_delay(player_gravel.stream.get_length() * 2)
+
+var isAbstractPlaying = false
+func play_abstract_sound(room_scale: float):
+	if isAbstractPlaying:
+		return
+	isAbstractPlaying = true
+	cave_effects_reverb.room_size = room_scale
+	player_abstract.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
+	player_abstract.volume_db = -(room_scale * 10) # Placeholder
+	player_abstract.stream = abstractTrack
+	player_abstract.play(randf_range(0, 145))
+	fade_in_music(player_abstract, 0, 1)
+	fade_out_music(player_abstract, 5, 2)
+	create_tween().tween_property(self, "isAbstractPlaying", false, 0.0).set_delay(player_abstract.stream.get_length() * 2)
+
 #endregion
 
 #region Effects
-func removeReverbEffectOrNull(bus_id: int) -> AudioEffectReverb:
-	for i in range(AudioServer.get_bus_effect_count(bus_id)):
-		var effect = AudioServer.get_bus_effect(bus_id, i)
-		AudioServer.remove_bus_effect(bus_id,i)
-		if effect is AudioEffectReverb:
-			return effect
-	return null
-
 func removeLowPassEffectOrNull(bus_id: int) -> AudioEffectLowPassFilter:
 	for i in range(AudioServer.get_bus_effect_count(bus_id)):
 		var effect = AudioServer.get_bus_effect(bus_id, i)

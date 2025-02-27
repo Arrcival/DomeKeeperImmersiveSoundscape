@@ -16,10 +16,13 @@ const layer3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Trac
 var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new()
 
 const DROPLET_THRESHOLD: int = 400
-const ABSTRACT_THRESHOLD: int = 600
+const GRAVEL_THRESHOLD: int = 600
+const ABSTRACT_THRESHOLD: int = 800
 const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
+const GRAVEL_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 
 const DROPLET_CHANCE_PER_FRAME: float = 0.0005
+const GRAVEL_CHANCE_PER_FRAME: float = 0.00025
 const ABSTRACT_CHANCE_PER_FRAME: float = 0.0000025
 
 func _process(delta):
@@ -28,8 +31,7 @@ func _process(delta):
 	# Fade music anyway before-brebattle music
 	
 	_process_carriable()
-	_process_droplets()
-	_process_abstract()
+	_process_sounds()
 
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
@@ -65,6 +67,11 @@ func _process_carriable() -> void:
 		Audio.stopMusic(0.0,3.0)
 		current_song = MUSIC_TYPE.NONE
 
+func _process_sounds():
+	_process_droplets()
+	_process_gravel()
+	_process_abstract()
+
 func _process_droplets() -> void:
 	var keeper_distance_to_dome = global_position.length()
 	if keeper_distance_to_dome >= DROPLET_THRESHOLD and GameWorld.paused == false:
@@ -74,15 +81,25 @@ func _process_droplets() -> void:
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
 			Audio.play_droplet_sound(room_scale * 2)
 
+func _process_gravel() -> void:
+	var keeper_distance_to_dome = global_position.length()
+	if keeper_distance_to_dome >= GRAVEL_THRESHOLD and GameWorld.paused == false:
+		var random = randf()
+		if random < GRAVEL_CHANCE_PER_FRAME:
+			# Should be between 0-1
+			var room_scale : float = (keeper_distance_to_dome - GRAVEL_THRESHOLD) / (GRAVEL_THRESHOLD_MAX_RANGE_REVERB - GRAVEL_THRESHOLD)
+			Audio.play_gravel_sound(room_scale * 2)
+
 func _process_abstract() -> void:
 	var keeper_distance_to_dome = global_position.length()
 	if keeper_distance_to_dome >= ABSTRACT_THRESHOLD and GameWorld.paused == false:
 		var mult = 1 + (keeper_distance_to_dome - 400)/1000
 		var random = randf()
-		if random < (ABSTRACT_CHANCE_PER_FRAME*mult):
+		if random < (ABSTRACT_CHANCE_PER_FRAME * mult):
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
 			Audio.play_abstract_sound(room_scale * 2)
+
 func getMaterialValue(material:String):
 	match material:
 		CONST.POWERCORE:
