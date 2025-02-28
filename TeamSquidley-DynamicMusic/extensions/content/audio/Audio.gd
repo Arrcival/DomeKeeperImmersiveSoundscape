@@ -18,6 +18,7 @@ var player_preroundmusic: AudioStreamPlayer # beofre round starts loop
 
 var player_heavy_skymonster: AudioStreamPlayer
 var player_heavy_groundmonster: AudioStreamPlayer
+var player_final_wave_intro: AudioStreamPlayer
 var player_final_wave: AudioStreamPlayer
 
 # intensity based on wave number ? monsters amount ? damage taken ? strongest enemy ?
@@ -42,7 +43,7 @@ const prebattle2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/
 const prebattle3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop3_V2.ogg")
 const prebattle4 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop4_V2.ogg")
 var prebattleloop
-const abstractTrack = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/abstractsounds.ogg")
+const abstractTrack = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/abstractsounds.wav")
 
 const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1.ogg"),
@@ -109,7 +110,6 @@ const gravelsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Left2.mp3"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Right.mp3"),
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Right2.mp3"),
-
 ]
 # Arbitrary numbers
 const WEIGHT_CAP1 := 6
@@ -134,7 +134,7 @@ func _ready():
 	var cave_effect_bus_id = AudioServer.bus_count
 	AudioServer.add_bus(AudioServer.bus_count)
 	AudioServer.set_bus_name(cave_effect_bus_id, BUS_CAVE_EFFECTS_NAME)
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(BUS_CAVE_EFFECTS_NAME), 0.0)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(BUS_CAVE_EFFECTS_NAME), -3.0)
 	cave_effects_reverb = AudioEffectReverb.new()
 	AudioServer.add_bus_effect(cave_effect_bus_id, cave_effects_reverb)
 	
@@ -171,24 +171,19 @@ func _ready():
 	player_heavy_skymonster = generateMusicPlayer()
 	player_final_wave = generateMusicPlayer()
 
-	player_final_wave = generatePlayer(&"Music", 0, false)
-	player_final_wave.volume_db = -60
-	player_final_wave.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg") # the epic song goes there 8)
+	player_final_wave = generateMusicPlayer()
+	player_final_wave.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/final_wave_loop_no_res.mp3")
 	
-	if USE_RESONANCE:
-		player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/base_layer_res.mp3")
-		player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/medium_intensity_res.mp3")
-		player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/high_intensity_res.mp3")
-		player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/ground_boss_res.mp3")
-		player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/sky_boss_res.mp3")
-	else:
-		player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/base_layer_no_res.mp3")
-		player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/medium_intensity_no_res.mp3")
-		player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/high_intensity_no_res.mp3")
-		player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/ground_boss_no_res.mp3")
-		player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/sky_boss_no_res.mp3")
+	player_final_wave_intro = generateMusicPlayer()
+	player_final_wave_intro.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/final_wave_intro_res2.mp3")
 	
 	
+	player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/base_layer_loop_no_res2.mp3")
+	player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/medium_intensity_loop_no_res2.mp3")
+	player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/high_intensity_loop_no_res2.mp3")
+	player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/ground_boss_no_res2.mp3")
+	player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/sky_boss_no_res2.mp3")
+
 	allBattleMusicsPlayers = [
 		player_battle_default,
 		player_battle_mid_intensity,
@@ -213,7 +208,7 @@ func playDiscovery():
 		player_discovery.play()
 
 func preBattleMusic(time_left: float):
-	if wavenum >=1 and wavenum < 5:
+	if wavenum >= 1 and wavenum < 5:
 		prebattleloop = prebattle1
 	elif wavenum >= 5 and wavenum <9:
 		prebattleloop = prebattle2
@@ -325,10 +320,16 @@ func playAmbienceMine():
 
 func stopAmbienceMine():
 	super.stopAmbienceMine()
-	# stop new sounds here
+
 func playFinalWaveMusic():
-	player_final_wave.play()
-	fade_in_music(player_final_wave, 0.0, 3.0)
+	player_final_wave_intro.volume_db = -30
+	player_final_wave.volume_db = -30
+	player_final_wave_intro.play()
+	fade_in_music(player_final_wave_intro, 0.0, 2.0)
+	var intro_duration = player_final_wave_intro.stream.get_length()
+	var tween = create_tween()
+	fade_in_music(player_final_wave, intro_duration - 16.0, 1.0)
+	tween.tween_callback(player_final_wave.play).set_delay(intro_duration)
 #endregion
 
 #region Events
@@ -483,8 +484,13 @@ func mushroomIncreasePitch(duration: float):
 	var tween = create_tween()
 	tween.tween_property(master_pitch_effect, "pitch_scale", 1.0, 1).set_delay(duration)
 
+
+#region Override
 func sound(soundName:String):
 	#skipping replaced sounds by music/new sounds
 	if soundName == "wavestart":
 		return
 	super.sound(soundName)
+
+
+#endregion

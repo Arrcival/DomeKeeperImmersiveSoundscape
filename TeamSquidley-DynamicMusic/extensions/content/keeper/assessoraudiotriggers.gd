@@ -18,9 +18,9 @@ const ABSTRACT_THRESHOLD: int = 800
 const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 const GRAVEL_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 
-const DROPLET_CHANCE_PER_FRAME: float = 0.0005
+const DROPLET_CHANCE_PER_FRAME: float = 0.05
 const GRAVEL_CHANCE_PER_FRAME: float = 0.00025
-const ABSTRACT_CHANCE_PER_FRAME: float = 0.0000025
+const ABSTRACT_CHANCE_PER_FRAME: float = 0.000125
 
 func _process(delta):
 	time = Data.of("monsters.wavecooldown")
