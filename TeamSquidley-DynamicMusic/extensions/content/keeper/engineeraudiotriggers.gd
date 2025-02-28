@@ -76,14 +76,10 @@ func _process_droplets() -> void:
 	var keeper_distance_to_dome = global_position.length()
 	if keeper_distance_to_dome >= DROPLET_THRESHOLD_LOUD and GameWorld.paused == false:
 		var random = randf()
-		if random < DROPLET_CHANCE_PER_FRAME:
-			# Should be between 0-1
+		if random < DROPLET_CHANCE_LOUD_PER_FRAME:
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
 			Audio.play_droplet_sound(room_scale * 2,true)
-	elif keeper_distance_to_dome >= DROPLET_THRESHOLD and GameWorld.paused == false:
-		var random = randf()
-		if random < DROPLET_CHANCE_LOUD_PER_FRAME:
-			# Should be between 0-1
+		elif random < DROPLET_CHANCE_PER_FRAME:
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
 			Audio.play_droplet_sound(room_scale * 2,false)
 
