@@ -10,7 +10,7 @@ var timewithoutmusic = 0
 var volume = 0
 var transitionsongtime = 0
 
-var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new()
+var consts = load("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd").new()
 
 const DROPLET_THRESHOLD: int = 300
 const GRAVEL_THRESHOLD: int = 600

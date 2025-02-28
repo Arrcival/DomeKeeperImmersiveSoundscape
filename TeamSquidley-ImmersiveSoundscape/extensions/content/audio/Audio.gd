@@ -1,6 +1,6 @@
 extends "res://systems/audio/Audio.gd"
 
-const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd")
+const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd")
 
 
 var additionalMineAmbience: AudioStreamPlayer
@@ -38,78 +38,78 @@ var player_discovery: AudioStreamPlayer
 
 var monstersAmount: int = 0
 
-const prebattle1 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop1_V2.ogg")
-const prebattle2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop2_V2.ogg")
-const prebattle3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop3_V2.ogg")
-const prebattle4 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop4_V2.ogg")
+const prebattle1 = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/wave_approaching_loop1_V2.ogg")
+const prebattle2 = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/wave_approaching_loop2_V2.ogg")
+const prebattle3 = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/wave_approaching_loop3_V2.ogg")
+const prebattle4 = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/wave_approaching_loop4_V2.ogg")
 var prebattleloop
-const abstractTrack = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/abstractsounds.ogg")
+const abstractTrack = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/abstractsounds.ogg")
 
 const dropletsounds = [
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water6.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water7.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water8.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water9.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water10.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water11.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water12.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water13.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water14.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water15.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1_Right2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water2_Right2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water3_Right2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water4_Right2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water5_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water1.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water2.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water3.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water4.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water5.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water6.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water7.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water8.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water9.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water10.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water11.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water12.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water13.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water14.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water15.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water1_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water1_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water1_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water1_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water2_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water2_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water2_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water2_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water3_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water3_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water3_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water3_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water4_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water4_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water4_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water4_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water5_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water5_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water5_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/water5_Right2.mp3"),
 ]
 const gravelsounds = [
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble6.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble7.ogg"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble1_Right2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble2_Right2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble3_Right2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble4_Right2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Left.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Left2.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Right.mp3"),
-	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/crumble5_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble1.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble2.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble3.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble4.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble5.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble6.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble7.ogg"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble1_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble1_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble1_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble1_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble2_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble2_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble2_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble2_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble3_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble3_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble3_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble3_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble4_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble4_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble4_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble4_Right2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble5_Left.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble5_Left2.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble5_Right.mp3"),
+	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble5_Right2.mp3"),
 ]
 # Arbitrary numbers
 const WEIGHT_CAP1 := 6
@@ -154,13 +154,13 @@ func _ready():
 	
 	player_heartbeat = generatePlayer(&"UI", 0, false)
 	player_heartbeat.volume_db = 15
-	player_heartbeat.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/heartbeat.ogg")
+	player_heartbeat.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/heartbeat.ogg")
 	player_preroundhorn = generatePlayer(&"Sounds", 0, false)
 	player_preroundhorn.volume_db = 0
-	player_preroundhorn.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(intro).ogg")
+	player_preroundhorn.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/wave_approaching(intro).ogg")
 	player_preroundmusic = generatePlayer(&"Music", 0, false)
 	player_preroundmusic.volume_db = -60
-	player_preroundmusic.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching(loop).ogg")
+	player_preroundmusic.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/wave_approaching(loop).ogg")
 	
 	player_battle_default = generateMusicPlayer()
 	
@@ -172,17 +172,17 @@ func _ready():
 	player_final_wave = generateMusicPlayer()
 
 	player_final_wave = generateMusicPlayer()
-	player_final_wave.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/final_wave_loop_no_res.mp3")
+	player_final_wave.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/final_wave_loop_no_res.mp3")
 	
 	player_final_wave_intro = generateMusicPlayer()
-	player_final_wave_intro.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/final_wave_intro_res2.mp3")
+	player_final_wave_intro.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/final_wave_intro_res2.mp3")
 	
 	
-	player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/base_layer_loop_no_res2.mp3")
-	player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/medium_intensity_loop_no_res2.mp3")
-	player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/high_intensity_loop_no_res2.mp3")
-	player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/ground_boss_no_res2.mp3")
-	player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Musics/sky_boss_no_res2.mp3")
+	player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/base_layer_loop_no_res2.mp3")
+	player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/medium_intensity_loop_no_res2.mp3")
+	player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/high_intensity_loop_no_res2.mp3")
+	player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/ground_boss_no_res2.mp3")
+	player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/sky_boss_no_res2.mp3")
 
 	allBattleMusicsPlayers = [
 		player_battle_default,
@@ -200,7 +200,7 @@ func _ready():
 	player_abstract.volume_db = -5
 	player_discovery = generatePlayer(&"Sounds", 0, false)
 	player_discovery.volume_db = -5
-	player_discovery.stream = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/discovering.mp3")
+	player_discovery.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/discovering.mp3")
 	#endregion
 
 func playDiscovery():

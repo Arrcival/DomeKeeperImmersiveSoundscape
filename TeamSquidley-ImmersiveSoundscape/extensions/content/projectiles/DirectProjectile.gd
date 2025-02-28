@@ -1,6 +1,6 @@
 extends "res://content/shared/projectiles/DirectProjectile.gd"
 
-const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd")
+const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd")
 
 func _physics_process(delta):
 	super._physics_process(delta)

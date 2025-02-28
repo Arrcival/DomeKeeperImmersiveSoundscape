@@ -1,6 +1,6 @@
 extends "res://content/shared/projectiles/PathProjectile.gd"
 
-const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd")
+const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd")
 
 func onTravelFinished():
 	super.onTravelFinished()

@@ -1,7 +1,7 @@
 extends Node
 
-const MYMODNAME_MOD_DIR = "TeamSquidley-DynamicMusic/"
-const MYMODNAME_LOG = "TeamSquidley-DynamicMusic"
+const MYMODNAME_MOD_DIR = "TeamSquidley-ImmersiveSoundscape/"
+const MYMODNAME_LOG = "TeamSquidley-ImmersiveSoundscape"
 
 const EXTENSIONS_DIR = "extensions/"
 const HOOKS_DIR = "hooks/"
