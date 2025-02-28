@@ -39,33 +39,33 @@ func _process_carriable() -> void:
 	#print(Audio.checkPreBattleMusic())
 	if current_song == MUSIC_TYPE.MONSTERS_APPROACHING:
 		return
-	if carriedCarryables.size() >= 1:
-		var carriedvalue = 0
-		for item in carriedCarryables:
-			if not is_instance_of(item,Drop):
-				return
-			if item.type == CONST.PACK:
-				for drop in item.dropData:
-					carriedvalue += getMaterialValue(drop[0])
-			else:
-				if getMaterialValue(item.type) == null:
-					return
-				carriedvalue += getMaterialValue(item.type)
-		# if a song is playing, do not interrupt
-		if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song not in [MUSIC_TYPE.GOOD_LOOT, MUSIC_TYPE.MONSTERS_APPROACHING] and not Audio.checkPreBattleMusic():
-			current_song = MUSIC_TYPE.GOOD_LOOT
-			#play the song
-			Audio.startMusic(1, 3.0)
-		elif Audio.checkPreBattleMusic():
-			Audio.stopMusic(0.0, 3.0)
-		elif carriedvalue < 9 and current_song == MUSIC_TYPE.GOOD_LOOT:
-			carriedvalue = 0
-			Audio.stopMusic(0.0, 3.0)
-			current_song = MUSIC_TYPE.NONE
-	elif current_song == MUSIC_TYPE.GOOD_LOOT:
-		#if you drop to 1 or 0 materials, the song fades away
-		Audio.stopMusic(0.0,3.0)
-		current_song = MUSIC_TYPE.NONE
+	#if carriedCarryables.size() >= 1:
+		#var carriedvalue = 0
+		#for item in carriedCarryables:
+			#if not is_instance_of(item,Drop):
+				#return
+			#if item.type == CONST.PACK:
+				#for drop in item.dropData:
+					#carriedvalue += getMaterialValue(drop[0])
+			#else:
+				#if getMaterialValue(item.type) == null:
+					#return
+				#carriedvalue += getMaterialValue(item.type)
+		## if a song is playing, do not interrupt
+		#if not Audio.isMusicPlaying() and carriedvalue >= 9 and current_song not in [MUSIC_TYPE.GOOD_LOOT, MUSIC_TYPE.MONSTERS_APPROACHING] and not Audio.checkPreBattleMusic():
+			#current_song = MUSIC_TYPE.GOOD_LOOT
+			##play the song
+			#Audio.startMusic(1, 3.0)
+		#elif Audio.checkPreBattleMusic():
+			#Audio.stopMusic(0.0, 3.0)
+		#elif carriedvalue < 9 and current_song == MUSIC_TYPE.GOOD_LOOT:
+			#carriedvalue = 0
+			#Audio.stopMusic(0.0, 3.0)
+			#current_song = MUSIC_TYPE.NONE
+	#elif current_song == MUSIC_TYPE.GOOD_LOOT:
+		##if you drop to 1 or 0 materials, the song fades away
+		#Audio.stopMusic(0.0,3.0)
+		#current_song = MUSIC_TYPE.NONE
 
 func _process_sounds():
 	_process_droplets()
@@ -107,24 +107,24 @@ func _process_abstract() -> void:
 			Audio.play_abstract_sound(room_scale * 2)
 
 
-func getMaterialValue(material:String):
-	match material:
-		CONST.POWERCORE:
-			return 18
-		CONST.GADGET:
-			return 18
-		CONST.RELIC:
-			return 20
-		CONST.EGG:
-			return 0
-		CONST.IRON:
-			return 1
-		CONST.WATER:
-			return 2
-		CONST.SAND:
-			# warning : doesn't consider cobalts or revives
-			if (consts.getTotalHp() * 100) / Data.of("dome.maxhealth") <= 25:
-				return 6
-			return 3
-		CONST.PACK:
-			return 99
+#func getMaterialValue(material:String):
+	#match material:
+		#CONST.POWERCORE:
+			#return 18
+		#CONST.GADGET:
+			#return 18
+		#CONST.RELIC:
+			#return 20
+		#CONST.EGG:
+			#return 0
+		#CONST.IRON:
+			#return 1
+		#CONST.WATER:
+			#return 2
+		#CONST.SAND:
+			## warning : doesn't consider cobalts or revives
+			#if (consts.getTotalHp() * 100) / Data.of("dome.maxhealth") <= 25:
+				#return 6
+			#return 3
+		#CONST.PACK:
+			#return 99
