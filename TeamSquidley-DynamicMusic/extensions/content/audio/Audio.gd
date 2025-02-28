@@ -136,6 +136,7 @@ func _ready():
 	AudioServer.set_bus_name(cave_effect_bus_id, BUS_CAVE_EFFECTS_NAME)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index(BUS_CAVE_EFFECTS_NAME), -3.0)
 	cave_effects_reverb = AudioEffectReverb.new()
+	cave_effects_reverb.room_size = 0
 	AudioServer.add_bus_effect(cave_effect_bus_id, cave_effects_reverb)
 	
 	heartbeat_lowpass = AudioEffectLowPassFilter.new()
@@ -144,9 +145,8 @@ func _ready():
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("Music"), heartbeat_lowpass)
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("Sounds"), heartbeat_lowpass)
 	
-	master_pitch_effect = AudioEffectPitchShift.new()
-	master_pitch_effect.pitch_scale = 1.0
-	AudioServer.add_bus_effect(AudioServer.get_bus_index("Master"), master_pitch_effect)
+	#master_pitch_effect = AudioEffectPitchShift.new()
+	#master_pitch_effect.pitch_scale = 1.0
 	#endregion
 
 	#region Creating and registering audio players
@@ -231,6 +231,12 @@ func checkPreBattleMusic():
 func gameOver():
 	finalwave = false
 	removeMuffle()
+	
+func startEnding(delay := 0.0):
+	super.startEnding(delay)
+	finalwave = false
+	stopBattleMusic()
+	removeMuffle()
 
 var audioMuffled = false
 func muffleAudio():
@@ -310,7 +316,8 @@ func stopBattleMusic():
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		fade_out_music(player, 0.0, 4.0)
 		stop_music(player)
-	fade_out_music(player_final_wave)
+	stop_music(player_final_wave_intro)
+	stop_music(player_final_wave)
 #endregion
 
 #region Ambience
@@ -482,11 +489,14 @@ func fade_in_music_bus(fade :float = 1.0):
 	tween.tween_property(self, "isFadingIn", false, 0.0).set_delay(fade)
 #endregion
 
-func mushroomIncreasePitch(duration: float):
-	master_pitch_effect.pitch_scale = 1.25
-	var tween = create_tween()
-	tween.tween_property(master_pitch_effect, "pitch_scale", 1.25, 1)
-	tween.tween_property(master_pitch_effect, "pitch_scale", 1.0, 1).set_delay(duration)
+#func mushroomIncreasePitch(duration: float):
+#	master_pitch_effect.pitch_scale = 1.25
+#	var bus_id = AudioServer.get_bus_index("Master")
+#	AudioServer.add_bus_effect(AudioServer.get_bus_index("Master"), master_pitch_effect)
+#	var tween = create_tween()
+#	tween.tween_property(master_pitch_effect, "pitch_scale", 1.25, 1)
+#	tween.tween_property(master_pitch_effect, "pitch_scale", 1.0, 1).set_delay(duration)
+#	tween.tween_callback(AudioServer.remove_bus_effect.bind(bus_id, master_pitch_effect)).set_delay(duration)
 
 
 #region Override
