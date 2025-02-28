@@ -1,0 +1,34 @@
+{
+	"dependencies": [],
+	"description": "This mod adds music, ambience and a new sound experience, while giving you more auditive cues.",
+	"extra": {
+		"godot": {
+			"authors": [
+				"Arrcival",
+				"Kagegona",
+				"Sebaman2009"
+			],
+			"compatible_game_version": [
+				"4.2.1"
+			],
+			"compatible_mod_loader_version": [
+				"3.0.0",
+				"6.2.0",
+				"7.0.0"
+			],
+			"config_schema": {
+
+			},
+			"description_rich": "",
+			"image": null,
+			"incompatibilities": [],
+			"load_before": [],
+			"optional_dependencies": [],
+			"tags": []
+		}
+	},
+	"name": "ImmersiveSoundscape",
+	"namespace": "TeamSquidley",
+	"version_number": "1.0.0",
+	"website_url": "https://"
+}
