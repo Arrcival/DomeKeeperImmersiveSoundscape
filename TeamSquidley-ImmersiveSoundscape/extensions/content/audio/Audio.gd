@@ -392,7 +392,7 @@ func set_music_based_on_hp():
 
 var isHeartbeatPlaying = false
 func _check_heartbeat() -> void:
-	if CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying:
+	if CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying and not finalwave:
 		player_heartbeat.volume_db = -60
 		player_heartbeat.play()
 		fade_in_music(player_heartbeat, 0.0, 1.0)
