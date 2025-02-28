@@ -222,7 +222,7 @@ func preBattleMusic(time_left: float):
 	player_preroundmusic.volume_db = -18
 	player_preroundmusic.play()
 	fade_in_music(player_preroundmusic, 1.5, time_left - 2)
-	fade_out_music(player_preroundmusic, time_left, 1)
+	fade_out_music(player_preroundmusic, time_left + 1, 2)
 	prebattle = true
 
 func checkPreBattleMusic():
@@ -412,7 +412,7 @@ func play_droplet_sound(room_scale: float,loud:bool):
 	if loud:
 		player_droplet.volume_db = -(room_scale * 10) # Placeholder
 	else:
-		player_droplet.volume_db = -(room_scale * 15) # Placeholder
+		player_droplet.volume_db = - 12 - (room_scale * 10) # Placeholder
 	isDropletPlaying = true
 	cave_effects_reverb.room_size = room_scale
 	player_droplet.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
@@ -444,7 +444,7 @@ func play_abstract_sound(room_scale: float):
 	player_abstract.play(randf_range(0, 145))
 	fade_in_music(player_abstract, 0, 1)
 	fade_out_music(player_abstract, 5, 2)
-	create_tween().tween_property(self, "isAbstractPlaying", false, 0.0).set_delay(player_abstract.stream.get_length() * 2)
+	create_tween().tween_property(self, "isAbstractPlaying", false, 0.0).set_delay(10)
 
 #endregion
 
