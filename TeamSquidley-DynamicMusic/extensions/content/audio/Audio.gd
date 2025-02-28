@@ -43,7 +43,7 @@ const prebattle2 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/
 const prebattle3 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop3_V2.ogg")
 const prebattle4 = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/wave_approaching_loop4_V2.ogg")
 var prebattleloop
-const abstractTrack = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/abstractsounds.wav")
+const abstractTrack = preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/abstractsounds.ogg")
 
 const dropletsounds = [
 	preload("res://mods-unpacked/TeamSquidley-DynamicMusic/Audio/Sounds/water1.ogg"),
