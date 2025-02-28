@@ -318,8 +318,10 @@ func stopBattleMusic():
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		fade_out_music(player, 0.0, 4.0)
 		stop_music(player)
-	stop_music(player_final_wave_intro)
-	stop_music(player_final_wave)
+	fade_out_music(player_final_wave_intro, 0.0, 4.0)
+	fade_out_music(player_final_wave, 0.0, 4.0)
+	stop_music(player_final_wave_intro, 1.0)
+	stop_music(player_final_wave, 1.0)
 	removeMuffle()
 #endregion
 
