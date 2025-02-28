@@ -15,10 +15,12 @@ var consts = load("res://mods-unpacked/TeamSquidley-DynamicMusic/Consts.gd").new
 const DROPLET_THRESHOLD: int = 400
 const GRAVEL_THRESHOLD: int = 600
 const ABSTRACT_THRESHOLD: int = 800
+const DROPLET_THRESHOLD_LOUD: int = 800
 const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 const GRAVEL_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 
 const DROPLET_CHANCE_PER_FRAME: float = 0.05
+const DROPLET_CHANCE_LOUD_PER_FRAME: float = 0.00025
 const GRAVEL_CHANCE_PER_FRAME: float = 0.00025
 const ABSTRACT_CHANCE_PER_FRAME: float = 0.000125
 
@@ -72,12 +74,18 @@ func _process_sounds():
 
 func _process_droplets() -> void:
 	var keeper_distance_to_dome = global_position.length()
-	if keeper_distance_to_dome >= DROPLET_THRESHOLD and GameWorld.paused == false:
+	if keeper_distance_to_dome >= DROPLET_THRESHOLD_LOUD and GameWorld.paused == false:
 		var random = randf()
 		if random < DROPLET_CHANCE_PER_FRAME:
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
-			Audio.play_droplet_sound(room_scale * 2)
+			Audio.play_droplet_sound(room_scale * 2,true)
+	elif keeper_distance_to_dome >= DROPLET_THRESHOLD and GameWorld.paused == false:
+		var random = randf()
+		if random < DROPLET_CHANCE_LOUD_PER_FRAME:
+			# Should be between 0-1
+			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
+			Audio.play_droplet_sound(room_scale * 2,false)
 
 func _process_gravel() -> void:
 	var keeper_distance_to_dome = global_position.length()

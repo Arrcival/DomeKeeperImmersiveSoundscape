@@ -399,13 +399,16 @@ func _check_heartbeat() -> void:
 			removeMuffle()
 
 var isDropletPlaying = false
-func play_droplet_sound(room_scale: float):
+func play_droplet_sound(room_scale: float,loud:bool):
 	if isDropletPlaying:
 		return
+	if loud:
+		player_droplet.volume_db = -(room_scale * 10) # Placeholder
+	else:
+		player_droplet.volume_db = -(room_scale * 20) # Placeholder
 	isDropletPlaying = true
 	cave_effects_reverb.room_size = room_scale
 	player_droplet.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
-	player_droplet.volume_db = -(room_scale * 10) # Placeholder
 	player_droplet.stream = dropletsounds[randi() % dropletsounds.size()]
 	player_droplet.play()
 	
