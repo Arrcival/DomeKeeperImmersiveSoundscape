@@ -240,6 +240,8 @@ func startEnding(delay := 0.0):
 
 var audioMuffled = false
 func muffleAudio():
+	if finalwave:
+		return
 	if audioMuffled:
 		return
 	audioMuffled = true
@@ -318,6 +320,7 @@ func stopBattleMusic():
 		stop_music(player)
 	stop_music(player_final_wave_intro)
 	stop_music(player_final_wave)
+	removeMuffle()
 #endregion
 
 #region Ambience
