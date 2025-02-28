@@ -344,26 +344,26 @@ func set_music_based_on_monster_amount(monsters_amount: int):
 	if not cap1 and not cap2:
 		if monstersAmount >= WEIGHT_CAP1:
 			cap1 = true
-			fade_out_music(player_battle_default, 1.0, 3.0)
+			fade_out_music(player_battle_default, 2.0, 3.0)
 			fade_in_music(player_battle_mid_intensity)
 		if monstersAmount >= WEIGHT_CAP2:
 			cap2 = true
-			fade_out_music(player_battle_mid_intensity, 1.0, 3.0)
+			fade_out_music(player_battle_mid_intensity, 2.0, 3.0)
 			fade_in_music(player_battle_high_intensity)
 			return
 	if cap1 and cap2:
 		if monstersAmount < WEIGHT_CAP2:
 			cap2 = false
-			fade_out_music(player_battle_mid_intensity, 1.0, 3.0)
+			fade_out_music(player_battle_mid_intensity, 2.0, 3.0)
 			fade_in_music(player_battle_high_intensity)
 	if cap1 and not cap2:
 		if monstersAmount < WEIGHT_CAP1:
 			cap1 = false
-			fade_out_music(player_battle_mid_intensity, 1.0, 3.0)
+			fade_out_music(player_battle_mid_intensity, 2.0, 3.0)
 			fade_in_music(player_battle_default)
 		elif monstersAmount >= WEIGHT_CAP2:
 			cap2 = true
-			fade_out_music(player_battle_mid_intensity, 1.0, 3.0)
+			fade_out_music(player_battle_mid_intensity, 2.0, 3.0)
 			fade_in_music(player_battle_high_intensity)
 
 # Should be called on heavy monster spawn
@@ -485,6 +485,7 @@ func fade_in_music_bus(fade :float = 1.0):
 func mushroomIncreasePitch(duration: float):
 	master_pitch_effect.pitch_scale = 1.25
 	var tween = create_tween()
+	tween.tween_property(master_pitch_effect, "pitch_scale", 1.25, 1)
 	tween.tween_property(master_pitch_effect, "pitch_scale", 1.0, 1).set_delay(duration)
 
 
@@ -494,6 +495,4 @@ func sound(soundName:String):
 	if soundName == "wavestart":
 		return
 	super.sound(soundName)
-
-
 #endregion
