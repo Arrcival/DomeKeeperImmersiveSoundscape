@@ -4,7 +4,6 @@ var hasPlayedHorn = false
 
 func _ready():
 	super._ready()
-	$WarnSound.stream = null
 
 func propertyChanged(property:String, oldValue, newValue):
 	super.propertyChanged(property, oldValue, newValue)
