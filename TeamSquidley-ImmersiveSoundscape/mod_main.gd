@@ -17,6 +17,7 @@ func _init(modLoader = ModLoader):
 	loadExtension(ext_dir, "content/audio/Audio.gd")
 	loadExtension(ext_dir, "game/GameWorld.gd")
 	loadExtension(ext_dir, "content/caves/mushroomcave/MushroomCave.gd")
+	loadExtension(ext_dir, "systems/data/Data.gd")
 	loadExtension(ext_dir, "content/hud/wavemeter/WaveMeter.gd")
 	loadExtension(ext_dir, "content/gamemode/assignments/Assignments.gd")
 	loadExtension(ext_dir, "content/gamemode/relichunt/Relichunt.gd")
@@ -27,7 +28,6 @@ func _init(modLoader = ModLoader):
 	loadExtension(ext_dir, "content/projectiles/PathProjectile.gd")
 	
 	# Find a way to not have the Monsters hook
-	loadHook("res://content/dome/Dome.gd", hooks_dir, "Dome.hooks.gd")
 	loadHook("res://content/monster/Monsters.gd", hooks_dir, "Monsters.hooks.gd")
 	loadHook("res://content/caves/Cave.gd", hooks_dir, "Cave.hooks.gd")
 	
