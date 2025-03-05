@@ -337,11 +337,11 @@ func playFinalWaveMusic():
 	player_final_wave_intro.volume_db = -30
 	player_final_wave.volume_db = -30
 	player_final_wave_intro.play()
-	fade_in_music(player_final_wave_intro, 0.0, 2.0)
-	var intro_duration = player_final_wave_intro.stream.get_length()
+	fade_in_music(player_final_wave_intro, 0.0, 1.0)
+	var intro_duration_delay = player_final_wave_intro.stream.get_length() - 8.0
 	var tween = create_tween()
-	fade_in_music(player_final_wave, intro_duration - 16.0, 1.0)
-	tween.tween_callback(player_final_wave.play).set_delay(intro_duration)
+	fade_in_music(player_final_wave, intro_duration_delay, 0.0)
+	tween.tween_callback(player_final_wave.play).set_delay(intro_duration_delay)
 #endregion
 
 #region Events
