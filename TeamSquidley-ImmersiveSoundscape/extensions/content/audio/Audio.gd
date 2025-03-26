@@ -112,19 +112,16 @@ const gravelsounds = [
 	preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/crumble5_Right2.mp3"),
 ]
 # Arbitrary numbers
-const WEIGHT_CAP1 := 6
-const WEIGHT_CAP2 := 9
-const HP_CAP := 400
+const WEIGHT_CAP1 := 5
+const WEIGHT_CAP2 := 8
+const HP_CAP := 500
 
 var allBattleMusicsPlayers: Array[AudioStreamPlayer]
 
 const BUS_CAVE_EFFECTS_NAME := "CaveEffects"
 
-const USE_RESONANCE = true
-
 var has_hp_faded_in: bool = false
 var prebattle = false
-var wavenum = 1
 var finalwave = false
 
 func _ready():
@@ -208,6 +205,7 @@ func playDiscovery():
 		player_discovery.play()
 
 func preBattleMusic(time_left: float):
+	var wavenum : int = Data.of("monsters.cycle") + 1
 	if wavenum >= 1 and wavenum < 5:
 		prebattleloop = prebattle1
 	elif wavenum >= 5 and wavenum <9:
@@ -221,8 +219,7 @@ func preBattleMusic(time_left: float):
 	player_preroundmusic.stream = prebattleloop
 	player_preroundmusic.volume_db = -18
 	player_preroundmusic.play()
-	fade_in_music(player_preroundmusic, 1.5, time_left - 2)
-	fade_out_music(player_preroundmusic, time_left + 1, 2)
+	fade_in_music(player_preroundmusic, 1.5, time_left - 2, -3)
 	prebattle = true
 
 func checkPreBattleMusic():
@@ -237,6 +234,9 @@ func startEnding(delay := 0.0):
 	finalwave = false
 	stopBattleMusic()
 	removeMuffle()
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"), 0)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"), 0)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("World"), 0)
 
 var audioMuffled = false
 func muffleAudio():
@@ -245,19 +245,21 @@ func muffleAudio():
 	if audioMuffled:
 		return
 	audioMuffled = true
-	heartbeat_lowpass.cutoff_hz = 2000
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"),-10)
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"),-10)
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"),-10)
+	create_tween().tween_property(heartbeat_lowpass, "cutoff_hz", 2000, 2.0)
+	
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"), -10)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), -10)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"), -10)
 
 func removeMuffle():
 	if not audioMuffled:
 		return
 	audioMuffled = false
-	heartbeat_lowpass.cutoff_hz = 20000
+	create_tween().tween_property(heartbeat_lowpass, "cutoff_hz", 20000, 2.0)
+	
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"), 0)
-	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Music"), 0)
 	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"), 0)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("World"), 0)
 
 func generateMusicPlayer() -> AudioStreamPlayer:
 	return generatePlayer(&"Music", -60, false)
@@ -297,6 +299,8 @@ func startBattleMusic():
 	set_music_based_on_monster_amount(0)
 	set_music_based_on_hp()
 	
+	fade_out_music(player_preroundmusic, 0, 8)
+	
 	ground_heavy_monster_activated = false
 	sky_heavy_monster_activated = false
 	prebattle = false
@@ -313,7 +317,6 @@ func startBattleMusic():
 
 func stopBattleMusic():
 	super.stopBattleMusic()
-	wavenum += 1
 	# stop every music, but should fade off to be less abrupt
 	for player: AudioStreamPlayer in allBattleMusicsPlayers:
 		fade_out_music(player, 0.0, 4.0)
@@ -323,6 +326,7 @@ func stopBattleMusic():
 	stop_music(player_final_wave_intro, 1.0)
 	stop_music(player_final_wave, 1.0)
 	removeMuffle()
+
 #endregion
 
 #region Ambience
@@ -338,10 +342,13 @@ func playFinalWaveMusic():
 	player_final_wave.volume_db = -30
 	player_final_wave_intro.play()
 	fade_in_music(player_final_wave_intro, 0.0, 1.0)
-	var intro_duration_delay = player_final_wave_intro.stream.get_length() - 8.0
+	var intro_duration_delay = player_final_wave_intro.stream.get_length() - 7.5
 	var tween = create_tween()
 	fade_in_music(player_final_wave, intro_duration_delay, 0.0)
 	tween.tween_callback(player_final_wave.play).set_delay(intro_duration_delay)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Monster"), -6)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("Sounds"), -6)
+	AudioServer.set_bus_volume_db(AudioServer.get_bus_index("World"), -6)
 #endregion
 
 #region Events
@@ -356,7 +363,6 @@ func set_music_based_on_monster_amount(monsters_amount: int):
 	if not cap1 and not cap2:
 		if monstersAmount >= WEIGHT_CAP1:
 			cap1 = true
-			fade_out_music(player_battle_default, 2.0, 3.0)
 			fade_in_music(player_battle_mid_intensity)
 		if monstersAmount >= WEIGHT_CAP2:
 			cap2 = true
@@ -372,7 +378,6 @@ func set_music_based_on_monster_amount(monsters_amount: int):
 		if monstersAmount < WEIGHT_CAP1:
 			cap1 = false
 			fade_out_music(player_battle_mid_intensity, 2.0, 3.0)
-			fade_in_music(player_battle_default)
 		elif monstersAmount >= WEIGHT_CAP2:
 			cap2 = true
 			fade_out_music(player_battle_mid_intensity, 2.0, 3.0)
@@ -400,13 +405,13 @@ func _check_heartbeat() -> void:
 	if CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying and not finalwave:
 		player_heartbeat.volume_db = -60
 		player_heartbeat.play()
-		fade_in_music(player_heartbeat, 0.0, 1.0)
+		fade_in_music(player_heartbeat, 0.0, 4.0)
 		isHeartbeatPlaying = true
 		muffleAudio()
 	elif CONSTMOD.getTotalHp() > 500 or CONSTMOD.getTotalHp() <= 0:
 		if isHeartbeatPlaying:
 			isHeartbeatPlaying = false
-			fade_out_music(player_heartbeat, 0.0, 1.0)
+			fade_out_music(player_heartbeat, 0.0, 4.0)
 			stop_music(player_heartbeat, 1.0)
 			removeMuffle()
 
@@ -415,11 +420,11 @@ func play_droplet_sound(room_scale: float,loud:bool):
 	if isDropletPlaying:
 		return
 	if loud:
-		player_droplet.volume_db = -(room_scale * 10) # Placeholder
+		player_droplet.volume_db = 3 -(room_scale * 5)
 	else:
-		player_droplet.volume_db = - 12 - (room_scale * 10) # Placeholder
+		player_droplet.volume_db = - 17 - (room_scale * 7)
 	isDropletPlaying = true
-	cave_effects_reverb.room_size = room_scale
+	cave_effects_reverb.room_size = min(room_scale * 1.3, 1.0)
 	player_droplet.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
 	player_droplet.stream = dropletsounds[randi() % dropletsounds.size()]
 	player_droplet.play()
@@ -432,7 +437,7 @@ func play_gravel_sound(room_scale: float):
 		return
 	isGravelPlaying = true
 	player_gravel.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
-	player_gravel.volume_db = -(room_scale * 10) # Placeholder
+	player_gravel.volume_db = -(room_scale * 10) - 8
 	player_gravel.stream = gravelsounds[randi() % gravelsounds.size()]
 	player_gravel.play()
 	create_tween().tween_property(self, "isGravelPlaying", false, 0.0).set_delay(player_gravel.stream.get_length() * 2)
@@ -444,7 +449,7 @@ func play_abstract_sound(room_scale: float):
 	isAbstractPlaying = true
 	cave_effects_reverb.room_size = room_scale
 	player_abstract.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
-	player_abstract.volume_db = -(room_scale * 10) # Placeholder
+	player_abstract.volume_db = -(room_scale * 10) - 3
 	player_abstract.stream = abstractTrack
 	player_abstract.play(randf_range(0, 145))
 	fade_in_music(player_abstract, 0, 1)
@@ -467,14 +472,14 @@ func stop_music(audioPlayer: AudioStreamPlayer, delay:=0.0):
 	var tween = create_tween()
 	tween.tween_callback(audioPlayer.stop).set_delay(delay)
 
-func fade_in_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0):
+func fade_in_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0, final_volume := 0):
 	if audioPlayer == null:
 		return
 	var tween = create_tween()
-	tween.tween_property(audioPlayer, "volume_db", 0, fade).set_trans(Tween.TRANS_LINEAR).set_delay(delay)
+	tween.tween_property(audioPlayer, "volume_db", final_volume, fade).set_trans(Tween.TRANS_LINEAR).set_delay(delay)
 #endregion
 
-#region Additional music
+#region Additional music fade out and in
 var isFadingOut = false
 func fade_out_music_bus(fade :float = 1.0):
 	if isFadingOut:

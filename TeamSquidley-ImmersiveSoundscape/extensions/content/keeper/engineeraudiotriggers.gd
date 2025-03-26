@@ -12,7 +12,7 @@ var transitionsongtime = 0
 
 var consts = load("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd").new()
 
-const DROPLET_THRESHOLD: int = 300
+const DROPLET_THRESHOLD: int = 500
 const GRAVEL_THRESHOLD: int = 600
 const ABSTRACT_THRESHOLD: int = 800
 const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000

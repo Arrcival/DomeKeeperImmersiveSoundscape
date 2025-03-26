@@ -9,7 +9,7 @@
 				"Sebaman2009"
 			],
 			"compatible_game_version": [
-				"4.2.1"
+				"4.2.2"
 			],
 			"compatible_mod_loader_version": [
 				"3.0.0",
@@ -29,6 +29,6 @@
 	},
 	"name": "ImmersiveSoundscape",
 	"namespace": "TeamSquidley",
-	"version_number": "1.1.1",
+	"version_number": "1.2.0",
 	"website_url": "https://"
 }
