@@ -6,22 +6,27 @@ enum MUSIC_TYPE { NONE = 0, MONSTERS_APPROACHING = 1, GOOD_LOOT = 2 }
 var current_song : MUSIC_TYPE = MUSIC_TYPE.NONE
 var time_between_waves = GameWorld.getTimeBetweenWaves()
 var time = 0
-var timewithoutmusic = 0
-var volume = 0
-var transitionsongtime = 0
 
-var consts = load("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd").new()
+var assessor_reverb : AudioEffectReverb
+var timer: Timer
 
-const DROPLET_THRESHOLD: int = 500
-const GRAVEL_THRESHOLD: int = 600
-const ABSTRACT_THRESHOLD: int = 800
-const DROPLET_THRESHOLD_MAX_RANGE_REVERB: int = 2000
-const GRAVEL_THRESHOLD_MAX_RANGE_REVERB: int = 2000
+var CONST = load("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd").new()
 
-const DROPLET_CHANCE_PER_FRAME: float = 0.05
-const DROPLET_CHANCE_LOUD_PER_FRAME: float = 0.001
-const GRAVEL_CHANCE_PER_FRAME: float = 0.00025
-const ABSTRACT_CHANCE_PER_FRAME: float = 0.000125
+func init():
+	super.init()
+
+	assessor_reverb = AudioEffectReverb.new()
+	assessor_reverb.room_size = 0
+	AudioServer.add_bus_effect(AudioServer.get_bus_index("Keeper"), assessor_reverb)
+
+	timer = Timer.new()
+	add_child(timer)
+	timer.wait_time = 1	
+	timer.timeout.connect(one_second_clock)
+	timer.start()
+
+func one_second_clock():
+	CONST.update_keeper_bus_reverb(global_position.length(), assessor_reverb)
 
 func _process(delta):
 	time = Data.of("monsters.wavecooldown")
@@ -29,7 +34,8 @@ func _process(delta):
 	# Fade music anyway before-brebattle music
 	
 	_process_carriable()
-	_process_sounds()
+	CONST.process_sounds(global_position.length())
+	CONST.update_keeper_bus_reverb(global_position.length(), assessor_reverb)
 
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
@@ -65,44 +71,6 @@ func _process_carriable() -> void:
 		##if you drop to 1 or 0 materials, the song fades away
 		#Audio.stopMusic(0.0,3.0)
 		#current_song = MUSIC_TYPE.NONE
-
-func _process_sounds():
-	_process_droplets()
-	_process_gravel()
-	_process_abstract()
-
-func _process_droplets() -> void:
-	var keeper_distance_to_dome = global_position.length()
-	if keeper_distance_to_dome >= DROPLET_THRESHOLD and GameWorld.paused == false:
-		var random = randf()
-		if random < DROPLET_CHANCE_LOUD_PER_FRAME:
-			# Should be between 0-1
-			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
-			Audio.play_droplet_sound(room_scale * 2,true)
-		random = randf()
-		if random < DROPLET_CHANCE_PER_FRAME:
-			# Should be between 0-1
-			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
-			Audio.play_droplet_sound(room_scale * 2,false)
-
-func _process_gravel() -> void:
-	var keeper_distance_to_dome = global_position.length()
-	if keeper_distance_to_dome >= GRAVEL_THRESHOLD and GameWorld.paused == false:
-		var random = randf()
-		if random < GRAVEL_CHANCE_PER_FRAME:
-			# Should be between 0-1
-			var room_scale : float = (keeper_distance_to_dome - GRAVEL_THRESHOLD) / (GRAVEL_THRESHOLD_MAX_RANGE_REVERB - GRAVEL_THRESHOLD)
-			Audio.play_gravel_sound(room_scale * 2)
-
-func _process_abstract() -> void:
-	var keeper_distance_to_dome = global_position.length()
-	if keeper_distance_to_dome >= ABSTRACT_THRESHOLD and GameWorld.paused == false:
-		var mult = 1 + (keeper_distance_to_dome - 400)/1000
-		var random = randf()
-		if random < (ABSTRACT_CHANCE_PER_FRAME * mult):
-			# Should be between 0-1
-			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
-			Audio.play_abstract_sound(room_scale * 2)
 
 
 #func getMaterialValue(material:String):

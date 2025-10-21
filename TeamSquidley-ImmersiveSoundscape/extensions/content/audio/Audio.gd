@@ -1,30 +1,21 @@
 extends "res://systems/audio/Audio.gd"
 
-const CONSTMOD = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd")
-
-
-var additionalMineAmbience: AudioStreamPlayer
+const CONST_AUDIO = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd")
 
 var player_battle_default: AudioStreamPlayer
-var player_battleMusicMonstersWeight: AudioStreamPlayer # monster amount
-var player_battleMusicMonstersWeight2: AudioStreamPlayer # monster amount
 
 var player_battle_mid_intensity: AudioStreamPlayer # monster amount v2
 var player_battle_high_intensity: AudioStreamPlayer # monster amount v2
 
 var player_heartbeat: AudioStreamPlayer # critical situation
-var player_preroundhorn: AudioStreamPlayer # beofre round starts sound
-var player_preroundmusic: AudioStreamPlayer # beofre round starts loop
+var player_preroundhorn: AudioStreamPlayer # before round starts sound
+var player_preroundmusic: AudioStreamPlayer # before round starts loop
 
 var player_heavy_skymonster: AudioStreamPlayer
 var player_heavy_groundmonster: AudioStreamPlayer
 var player_final_wave_intro: AudioStreamPlayer
 var player_final_wave: AudioStreamPlayer
 
-# intensity based on wave number ? monsters amount ? damage taken ? strongest enemy ?
-# outside dome variations? -> perhaps deafen monsters ?
-
-var player_additional_music: AudioStreamPlayer
 var player_droplet: AudioStreamPlayer
 var player_gravel: AudioStreamPlayer
 var player_abstract: AudioStreamPlayer
@@ -146,9 +137,7 @@ func _ready():
 	#master_pitch_effect.pitch_scale = 1.0
 	#endregion
 
-	#region Creating and registering audio players
-	player_additional_music = generateMusicPlayer()
-	
+	#region Creating and registering audio players	
 	player_heartbeat = generatePlayer(&"UI", 0, false)
 	player_heartbeat.volume_db = 15
 	player_heartbeat.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/heartbeat.ogg")
@@ -208,7 +197,7 @@ func preBattleMusic(time_left: float):
 	var wavenum : int = Data.of("monsters.cycle") + 1
 	if wavenum >= 1 and wavenum < 5:
 		prebattleloop = prebattle1
-	elif wavenum >= 5 and wavenum <9:
+	elif wavenum >= 5 and wavenum < 9:
 		prebattleloop = prebattle2
 	elif wavenum >= 9 and wavenum < 13:
 		prebattleloop = prebattle3
@@ -218,12 +207,11 @@ func preBattleMusic(time_left: float):
 	player_preroundhorn.play()
 	player_preroundmusic.stream = prebattleloop
 	player_preroundmusic.volume_db = -18
-	player_preroundmusic.play()
-	fade_in_music(player_preroundmusic, 1.5, time_left - 2, -3)
-	prebattle = true
 
-func checkPreBattleMusic():
-	return prebattle
+	if ModLoaderConfig.get_current_config(CONST_AUDIO.MOD_ID).data[CONST_AUDIO.CONFIG_ID_PREBATTLE_NOISE]:
+		player_preroundmusic.play()
+		fade_in_music(player_preroundmusic, 1.5, time_left - 2, -6)
+	prebattle = true
 
 func gameOver():
 	finalwave = false
@@ -402,13 +390,15 @@ func set_music_based_on_hp():
 
 var isHeartbeatPlaying = false
 func _check_heartbeat() -> void:
-	if CONSTMOD.getTotalHp() <= 500 and not isHeartbeatPlaying and not finalwave:
+	if not ModLoaderConfig.get_current_config(CONST_AUDIO.MOD_ID).data[CONST_AUDIO.CONFIG_ID_HEARTBEAT_EFFECT]:
+		return
+	if CONST_AUDIO.getTotalHp() <= 500 and not isHeartbeatPlaying and not finalwave:
 		player_heartbeat.volume_db = -60
 		player_heartbeat.play()
 		fade_in_music(player_heartbeat, 0.0, 4.0)
 		isHeartbeatPlaying = true
 		muffleAudio()
-	elif CONSTMOD.getTotalHp() > 500 or CONSTMOD.getTotalHp() <= 0:
+	elif CONST_AUDIO.getTotalHp() > 500 or CONST_AUDIO.getTotalHp() <= 0:
 		if isHeartbeatPlaying:
 			isHeartbeatPlaying = false
 			fade_out_music(player_heartbeat, 0.0, 4.0)
@@ -442,6 +432,7 @@ func play_gravel_sound(room_scale: float):
 	player_gravel.play()
 	create_tween().tween_property(self, "isGravelPlaying", false, 0.0).set_delay(player_gravel.stream.get_length() * 2)
 
+# To delete ?
 var isAbstractPlaying = false
 func play_abstract_sound(room_scale: float):
 	if isAbstractPlaying:
@@ -459,24 +450,25 @@ func play_abstract_sound(room_scale: float):
 #endregion
 
 #region Start & Stops
-# those method doesn't stop the players so they are still in sync
+# this method doesn't stop the players so they are still in sync
 func fade_out_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0):
 	if audioPlayer == null:
 		return
 	var tween = create_tween()
 	tween.tween_property(audioPlayer, "volume_db", -60, fade).set_trans(Tween.TRANS_LINEAR).set_delay(delay)
 
-func stop_music(audioPlayer: AudioStreamPlayer, delay:=0.0):
-	if audioPlayer == null:
-		return
-	var tween = create_tween()
-	tween.tween_callback(audioPlayer.stop).set_delay(delay)
-
 func fade_in_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0, final_volume := 0):
 	if audioPlayer == null:
 		return
 	var tween = create_tween()
 	tween.tween_property(audioPlayer, "volume_db", final_volume, fade).set_trans(Tween.TRANS_LINEAR).set_delay(delay)
+
+
+func stop_music(audioPlayer: AudioStreamPlayer, delay:=0.0):
+	if audioPlayer == null:
+		return
+	var tween = create_tween()
+	tween.tween_callback(audioPlayer.stop).set_delay(delay)
 #endregion
 
 #region Additional music fade out and in

@@ -17,7 +17,27 @@
 				"7.0.0"
 			],
 			"config_schema": {
-
+				"$schema": "https://json-schema.org/draft/2020-12/schema",
+				"description": "",
+				"properties": {
+					"prewave_noise": {
+						"default": true,
+						"title": "Pre-battle noise",
+						"type": "boolean"
+					},
+					"cave_discovery_sound": {
+						"default": true,
+						"title": "Cave discovery sound",
+						"type": "boolean"
+					},
+					"heartbeat_effect": {
+						"default": true,
+						"title": "Heartbeat effect",
+						"type": "boolean"
+					}
+				},
+				"title": "Immersive soundscape configuration schema",
+				"type": "object"
 			},
 			"description_rich": "",
 			"image": null,
