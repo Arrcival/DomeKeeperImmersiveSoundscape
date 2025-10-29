@@ -12,6 +12,7 @@ var player_preroundhorn: AudioStreamPlayer # before round starts sound
 var player_preroundmusic: AudioStreamPlayer # before round starts loop
 
 var player_heavy_skymonster: AudioStreamPlayer
+const SKYMONSTER_VOLUME_DIFF = -3
 var player_heavy_groundmonster: AudioStreamPlayer
 var player_final_wave_intro: AudioStreamPlayer
 var player_final_wave: AudioStreamPlayer
@@ -158,17 +159,18 @@ func _ready():
 	player_final_wave = generateMusicPlayer()
 
 	player_final_wave = generateMusicPlayer()
-	player_final_wave.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/final_wave_loop_no_res.mp3")
+	player_final_wave.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/final_wave_loop.mp3")
 	
 	player_final_wave_intro = generateMusicPlayer()
-	player_final_wave_intro.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/final_wave_intro_res2.mp3")
+	player_final_wave_intro.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/final_wave_intro.mp3")
 	
 	
-	player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/base_layer_loop_no_res2.mp3")
-	player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/medium_intensity_loop_no_res2.mp3")
-	player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/high_intensity_loop_no_res2.mp3")
-	player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/ground_boss_no_res2.mp3")
-	player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/sky_boss_no_res2.mp3")
+	player_battle_default.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/mx_wave_low_intensity.mp3")
+	player_battle_mid_intensity.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/mx_wave_medium_intensity.mp3")
+	player_battle_high_intensity.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/mx_wave_high_intensity.mp3")
+	player_heavy_groundmonster.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/mx_wave_ground_boss.mp3")
+	player_heavy_skymonster.stream = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Musics/mx_wave_sky_boss.mp3")
+	player_heavy_skymonster.volume_db -= SKYMONSTER_VOLUME_DIFF
 
 	allBattleMusicsPlayers = [
 		player_battle_default,
@@ -329,8 +331,8 @@ func playFinalWaveMusic():
 	player_final_wave_intro.volume_db = -30
 	player_final_wave.volume_db = -30
 	player_final_wave_intro.play()
-	fade_in_music(player_final_wave_intro, 0.0, 1.0)
-	var intro_duration_delay = player_final_wave_intro.stream.get_length() - 7.5
+	fade_in_music(player_final_wave_intro, 0.0, 0.0)
+	var intro_duration_delay = player_final_wave_intro.stream.get_length()
 	var tween = create_tween()
 	fade_in_music(player_final_wave, intro_duration_delay, 0.0)
 	tween.tween_callback(player_final_wave.play).set_delay(intro_duration_delay)
@@ -378,7 +380,7 @@ func set_music_based_on_strongest_monster(is_flying: bool):
 	if finalwave == true:
 		return
 	if is_flying and not sky_heavy_monster_activated:
-		fade_in_music(player_heavy_skymonster)
+		fade_in_music(player_heavy_skymonster, 0.0, 2.0, SKYMONSTER_VOLUME_DIFF)
 		sky_heavy_monster_activated = true
 	if not is_flying and not ground_heavy_monster_activated:
 		fade_in_music(player_heavy_groundmonster)
@@ -427,7 +429,7 @@ func play_gravel_sound(room_scale: float):
 		return
 	isGravelPlaying = true
 	player_gravel.pitch_scale = randf_range(0.9, 1.1) # Change the pitch of droplets
-	player_gravel.volume_db = -(room_scale * 10) - 8
+	player_gravel.volume_db = -(room_scale * 10) - 11
 	player_gravel.stream = gravelsounds[randi() % gravelsounds.size()]
 	player_gravel.play()
 	create_tween().tween_property(self, "isGravelPlaying", false, 0.0).set_delay(player_gravel.stream.get_length() * 2)

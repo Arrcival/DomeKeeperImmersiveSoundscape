@@ -22,12 +22,12 @@ static func update_keeper_bus_reverb(keeper_distance_to_dome: float, reverb_effe
 
 static func _process_droplets(keeper_distance_to_dome: float) -> void:
 	if keeper_distance_to_dome >= DROPLET_THRESHOLD and GameWorld.paused == false:
+		#var random = randf()
+		#if random < DROPLET_CHANCE_LOUD_PER_FRAME:
+		#	# Should be between 0-1
+		#	var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
+		#	Audio.play_droplet_sound(room_scale * 2, true)
 		var random = randf()
-		if random < DROPLET_CHANCE_LOUD_PER_FRAME:
-			# Should be between 0-1
-			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
-			Audio.play_droplet_sound(room_scale * 2, true)
-		random = randf()
 		if random < DROPLET_CHANCE_PER_FRAME:
 			# Should be between 0-1
 			var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
