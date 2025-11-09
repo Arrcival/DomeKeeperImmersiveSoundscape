@@ -9,24 +9,22 @@ const GRAVEL_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 const KEEPER_THRESHOLD_MAX_RANGE_REVERB: int = 2000
 
 const DROPLET_CHANCE_PER_FRAME: float = 0.03
-const DROPLET_CHANCE_LOUD_PER_FRAME: float = 0.001
 const GRAVEL_CHANCE_PER_FRAME: float = 0.00025
 const ABSTRACT_CHANCE_PER_FRAME: float = 0.000125
+
+const LOWER_MUSIC_VOLUME_THRESHOLD: int = 150
+
 
 static func process_sounds(keeper_distance_to_dome: float):
 	_process_droplets(keeper_distance_to_dome)
 	_process_gravel(keeper_distance_to_dome)
+	_process_fade_out_music(keeper_distance_to_dome)
 
 static func update_keeper_bus_reverb(keeper_distance_to_dome: float, reverb_effect: AudioEffectReverb):
 	reverb_effect.room_size = (keeper_distance_to_dome - KEEPER_THRESHOLD) / (KEEPER_THRESHOLD_MAX_RANGE_REVERB - KEEPER_THRESHOLD)
 
 static func _process_droplets(keeper_distance_to_dome: float) -> void:
 	if keeper_distance_to_dome >= DROPLET_THRESHOLD and GameWorld.paused == false:
-		#var random = randf()
-		#if random < DROPLET_CHANCE_LOUD_PER_FRAME:
-		#	# Should be between 0-1
-		#	var room_scale : float = (keeper_distance_to_dome - DROPLET_THRESHOLD) / (DROPLET_THRESHOLD_MAX_RANGE_REVERB - DROPLET_THRESHOLD)
-		#	Audio.play_droplet_sound(room_scale * 2, true)
 		var random = randf()
 		if random < DROPLET_CHANCE_PER_FRAME:
 			# Should be between 0-1
@@ -41,6 +39,12 @@ static func _process_gravel(keeper_distance_to_dome: float) -> void:
 			var room_scale : float = (keeper_distance_to_dome - GRAVEL_THRESHOLD) / (GRAVEL_THRESHOLD_MAX_RANGE_REVERB - GRAVEL_THRESHOLD)
 			Audio.play_gravel_sound(room_scale * 2)
 
+static func _process_fade_out_music(keeper_distance_to_dome: float) -> void:
+	Audio.handle_music_volume(keeper_distance_to_dome >= LOWER_MUSIC_VOLUME_THRESHOLD)
+
+static func process_keeper_buff(property: String, duration: float) -> void:
+	if property == "keeper.highbuff":
+		Audio.mushroomIncreasePitch(duration)
 
 static func getTotalHp() -> int:
 	var domeHealth = Data.of("dome.health")

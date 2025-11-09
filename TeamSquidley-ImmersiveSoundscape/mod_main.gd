@@ -26,7 +26,6 @@ func _init(modLoader = ModLoader):
 	loadExtension(ext_dir, "content/keeper/assessoraudiotriggers.gd")
 	loadExtension(ext_dir, "content/projectiles/DirectProjectile.gd")
 	loadExtension(ext_dir, "content/projectiles/PathProjectile.gd")
-	#loadExtension(ext_dir, "content/gadgets/mushroomfarm/MyzelOverlay.gd") # preload dans Tile :/
 	
 	# Find a way to not have the Monsters hook
 	loadHook("res://content/monster/Monsters.gd", hooks_dir, "Monsters.hooks.gd")

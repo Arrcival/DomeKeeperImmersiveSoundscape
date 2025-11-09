@@ -33,6 +33,10 @@ func _process(delta):
 	_process_carriable()
 	CONST.process_sounds(global_position.length())
 
+func addTemporaryBuff(property:String, amount, duration:float, origin:String):
+	super.addTemporaryBuff(property, amount, duration, origin)
+	CONST.process_keeper_buff(property, duration)
+
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
 	# Unless the loot become ambient, but then should probably be moved

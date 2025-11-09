@@ -30,6 +30,11 @@ var player_discovery: AudioStreamPlayer
 
 var monstersAmount: int = 0
 
+const PITCH_SCALE_MUSHROOM: float = 1.1
+const FADED_OUT_VOLUME_MUSIC: float = -15
+
+const ACTIVATE_MUSHROOM_PITCH: bool = false
+
 const prebattle1 = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/wave_approaching_loop1_V2.ogg")
 const prebattle2 = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/wave_approaching_loop2_V2.ogg")
 const prebattle3 = preload("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Audio/Sounds/wave_approaching_loop3_V2.ogg")
@@ -134,8 +139,10 @@ func _ready():
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("Music"), heartbeat_lowpass)
 	AudioServer.add_bus_effect(AudioServer.get_bus_index("Sounds"), heartbeat_lowpass)
 	
-	#master_pitch_effect = AudioEffectPitchShift.new()
-	#master_pitch_effect.pitch_scale = 1.0
+	if ACTIVATE_MUSHROOM_PITCH:
+		master_pitch_effect = AudioEffectPitchShift.new()
+		master_pitch_effect.pitch_scale = 1.0
+		AudioServer.add_bus_effect(AudioServer.get_bus_index("Master"), master_pitch_effect)
 	#endregion
 
 	#region Creating and registering audio players	
@@ -453,11 +460,11 @@ func play_abstract_sound(room_scale: float):
 
 #region Start & Stops
 # this method doesn't stop the players so they are still in sync
-func fade_out_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0):
+func fade_out_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0, volume = -60):
 	if audioPlayer == null:
 		return
 	var tween = create_tween()
-	tween.tween_property(audioPlayer, "volume_db", -60, fade).set_trans(Tween.TRANS_LINEAR).set_delay(delay)
+	tween.tween_property(audioPlayer, "volume_db", volume, fade).set_trans(Tween.TRANS_LINEAR).set_delay(delay)
 
 func fade_in_music(audioPlayer: AudioStreamPlayer, delay:=0.0, fade:=2.0, final_volume := 0):
 	if audioPlayer == null:
@@ -493,15 +500,30 @@ func fade_in_music_bus(fade :float = 1.0):
 	tween.tween_property(self, "isFadingIn", false, 0.0).set_delay(fade)
 #endregion
 
-#func mushroomIncreasePitch(duration: float):
-#	master_pitch_effect.pitch_scale = 1.25
-#	var bus_id = AudioServer.get_bus_index("Master")
-#	AudioServer.add_bus_effect(AudioServer.get_bus_index("Master"), master_pitch_effect)
-#	var tween = create_tween()
-#	tween.tween_property(master_pitch_effect, "pitch_scale", 1.25, 1)
-#	tween.tween_property(master_pitch_effect, "pitch_scale", 1.0, 1).set_delay(duration)
-#	tween.tween_callback(AudioServer.remove_bus_effect.bind(bus_id, master_pitch_effect)).set_delay(duration)
+func mushroomIncreasePitch(duration: float):
+	if not ACTIVATE_MUSHROOM_PITCH:
+		return
+	var tween = create_tween()
+	tween.tween_property(master_pitch_effect, "pitch_scale", PITCH_SCALE_MUSHROOM, 1)
+	var tween2 = create_tween()
+	tween2.tween_property(master_pitch_effect, "pitch_scale", 1.0, 1).set_delay(duration)
+	#tween.tween_callback(AudioServer.remove_bus_effect.bind(bus_id, master_pitch_effect)).set_delay(duration)
 
+var has_fade_out = false
+func handle_music_volume(should_fade_out: bool):
+	if not has_fade_out and should_fade_out:
+		has_fade_out = true
+		for player: AudioStreamPlayer in allBattleMusicsPlayers:
+			fade_out_music(player, 0.0, 2.0, FADED_OUT_VOLUME_MUSIC)
+			fade_out_music(player_final_wave_intro, 0, 2, FADED_OUT_VOLUME_MUSIC)
+			fade_out_music(player_final_wave, 0, 2, FADED_OUT_VOLUME_MUSIC)
+	if has_fade_out and not should_fade_out:
+		has_fade_out = false
+		for player: AudioStreamPlayer in allBattleMusicsPlayers:
+			fade_in_music(player, 0.0, 2.0)
+			fade_in_music(player_final_wave_intro, 0, 2, FADED_OUT_VOLUME_MUSIC)
+			fade_in_music(player_final_wave, 0, 2, FADED_OUT_VOLUME_MUSIC)
+		return
 
 #region Override
 func sound(soundName:String):

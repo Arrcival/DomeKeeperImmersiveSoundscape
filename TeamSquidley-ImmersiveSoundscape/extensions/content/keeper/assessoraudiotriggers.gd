@@ -22,11 +22,8 @@ func init():
 	timer = Timer.new()
 	add_child(timer)
 	timer.wait_time = 1	
-	timer.timeout.connect(one_second_clock)
+	timer.timeout.connect(CONST.update_keeper_bus_reverb.bind(global_position.length(), assessor_reverb))
 	timer.start()
-
-func one_second_clock():
-	CONST.update_keeper_bus_reverb(global_position.length(), assessor_reverb)
 
 func _process(delta):
 	time = Data.of("monsters.wavecooldown")
@@ -36,6 +33,10 @@ func _process(delta):
 	_process_carriable()
 	CONST.process_sounds(global_position.length())
 	CONST.update_keeper_bus_reverb(global_position.length(), assessor_reverb)
+
+func addTemporaryBuff(property:String, amount, duration:float, origin:String):
+	super.addTemporaryBuff(property, amount, duration, origin)
+	CONST.process_keeper_buff(property, duration)
 
 func _process_carriable() -> void:
 	# We do not process any loot music if there's approaching monsters
