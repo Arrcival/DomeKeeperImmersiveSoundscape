@@ -20,11 +20,6 @@
 				"$schema": "https://json-schema.org/draft/2020-12/schema",
 				"description": "",
 				"properties": {
-					"prewave_noise": {
-						"default": true,
-						"title": "Pre-battle noise",
-						"type": "boolean"
-					},
 					"cave_discovery_sound": {
 						"default": true,
 						"title": "Cave discovery sound",
@@ -33,6 +28,11 @@
 					"heartbeat_effect": {
 						"default": true,
 						"title": "Heartbeat effect",
+						"type": "boolean"
+					},
+					"prewave_noise": {
+						"default": true,
+						"title": "Pre-battle noise",
 						"type": "boolean"
 					}
 				},
@@ -49,6 +49,6 @@
 	},
 	"name": "ImmersiveSoundscape",
 	"namespace": "TeamSquidley",
-	"version_number": "1.2.0",
+	"version_number": "1.3.0",
 	"website_url": "https://"
 }
