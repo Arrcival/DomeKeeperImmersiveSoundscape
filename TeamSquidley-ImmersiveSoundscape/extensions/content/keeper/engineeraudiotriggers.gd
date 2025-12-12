@@ -7,7 +7,7 @@ var current_song : MUSIC_TYPE = MUSIC_TYPE.NONE
 var time_between_waves = GameWorld.getTimeBetweenWaves()
 var time = 0
 
-var engi_reverb : AudioEffectReverb
+var engi_reverb : AudioEffectReverb = null
 var timer: Timer
 
 var CONST = load("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd").new()
@@ -15,15 +15,8 @@ var CONST = load("res://mods-unpacked/TeamSquidley-ImmersiveSoundscape/Consts.gd
 func init():
 	super.init()
 
-	engi_reverb = AudioEffectReverb.new()
-	engi_reverb.room_size = 0
-	AudioServer.add_bus_effect(AudioServer.get_bus_index("Keeper"), engi_reverb)
+	engi_reverb = CONST.get_or_create_reverb()
 
-	timer = Timer.new()
-	add_child(timer)
-	timer.wait_time = 1	
-	timer.timeout.connect(CONST.update_keeper_bus_reverb.bind(global_position.length(), engi_reverb))
-	timer.start()
 
 func _process(delta):
 	time = Data.of("monsters.wavecooldown")
@@ -32,6 +25,7 @@ func _process(delta):
 	
 	_process_carriable()
 	CONST.process_sounds(global_position.length())
+	CONST.update_keeper_bus_reverb(global_position.length(), engi_reverb)
 
 func addTemporaryBuff(property:String, amount, duration:float, origin:String):
 	super.addTemporaryBuff(property, amount, duration, origin)
