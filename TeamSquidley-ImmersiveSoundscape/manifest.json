@@ -34,6 +34,11 @@
 						"default": true,
 						"title": "Pre-battle noise",
 						"type": "boolean"
+					},
+					"reverb_in_mine": {
+						"default": true,
+						"title": "Reverb inside the mine",
+						"type": "boolean"
 					}
 				},
 				"title": "Immersive soundscape configuration schema",
